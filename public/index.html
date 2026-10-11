@@ -1607,7 +1607,7 @@
     // ========== CONFIG ==========
     // Set this to your Railway downloader URL after you deploy it.
     // Leave empty ("") only for fully local testing.
-    const DOWNLOADER_URL = (window.NAIVE_DOWNLOADER_URL || localStorage.getItem('naive.downloaderUrl') || '').replace(/\/$/, '');
+    const DOWNLOADER_URL = (window.NAIVE_DOWNLOADER_URL || localStorage.getItem('naive.downloaderUrl') || 'https://naive-downloader-production.up.railway.app').replace(/\/$/, '');
     const dl = (path) => (DOWNLOADER_URL ? DOWNLOADER_URL : '') + path;
     // ============================
 
