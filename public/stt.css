@@ -1,0 +1,656 @@
+/* ==========================================================================
+   Speech to Text (transcriber) - sized and styled like the rest of Naive.
+   Everything is scoped to #stt / .stt-* so it cannot change the main app.
+   Uses Naive's own tokens: --pad --r --hero-pad --panel-pad --h3 --t-body
+   --top-h --ease --spring --blue --muted (phone first, grows on larger screens).
+   ========================================================================== */
+
+/* ---------- the Speech to Text icon at the top right of the header ---------- */
+/* ---------- full-screen view ---------- */
+#stt {
+  position: fixed;
+  inset: 0;
+  z-index: 60; /* above the tab bar (50), below toasts (100) and dialogs */
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  color: var(--txt);
+  background-color: #10121f; /* solid base: the page gradient ends 98% opaque, which let the tab bar ghost through */
+  background-image:
+    radial-gradient(35% 25% at 20% 80%, rgba(255, 255, 255, 0.2), transparent),
+    radial-gradient(30% 25% at 78% 70%, rgba(255, 255, 255, 0.1), transparent),
+    linear-gradient(270deg, #000f3f, #474747, #3b000dfa);
+}
+
+#stt:not([hidden]) {
+  animation: sttIn 0.24s var(--ease);
+}
+
+#stt.closing {
+  animation: sttOut 0.18s ease-in forwards;
+  pointer-events: none;
+}
+
+@keyframes sttIn {
+  from { opacity: 0; transform: translateY(26px); }
+}
+
+@keyframes sttOut {
+  to { opacity: 0; transform: translateY(26px); }
+}
+
+body.stt-open {
+  overflow: hidden;
+}
+
+.stt-app {
+  width: min(100%, 480px);
+  min-height: 100%;
+  margin: auto;
+  padding: calc(10px + env(safe-area-inset-top)) var(--pad) calc(30px + env(safe-area-inset-bottom));
+}
+
+.stt-top {
+  height: var(--top-h);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 9px;
+}
+
+.stt-back {
+  width: 31.5px;
+  height: 31.5px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: rgb(31, 41, 55);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.stt-back svg {
+  width: 16.5px;
+  height: 16.5px;
+}
+
+.stt-top h1 {
+  margin: 0;
+  font: 600 var(--h3) / 1.1 var(--serif);
+  letter-spacing: -0.3px;
+  color: #fff;
+}
+
+/* ---------- light glass cards (same recipe as Naive's .hero and .downloads) ---------- */
+.stt-hero,
+.stt-res {
+  border-radius: var(--r);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.stt-hero {
+  padding: var(--hero-pad);
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: var(--shadow), inset 0 1px rgba(255, 255, 255, 0.35);
+}
+
+.stt-hero h2 {
+  margin: 0 0 5.5px;
+  font: 600 clamp(21px, 7.2vw, var(--h2)) / 1.15 var(--serif);
+  letter-spacing: -0.2px;
+  color: rgb(4, 4, 4);
+}
+
+.stt-hero h2 span {
+  display: block; /* "into words." always sits on its own line */
+  color: var(--blue);
+}
+
+.stt-hero > p {
+  margin: 0 0 12.5px;
+  color: rgb(75, 85, 99);
+  font-size: var(--t-body);
+  line-height: 1.45;
+}
+
+.stt-res {
+  margin-top: 10.5px;
+  padding: var(--panel-pad);
+  background: rgba(255, 255, 255, 0.41);
+  box-shadow: var(--shadow), inset 0 1px rgba(255, 255, 255, 0.3);
+}
+
+/* ---------- upload area ---------- */
+.stt-drop {
+  padding: 19.5px 12.5px 14px;
+  text-align: center;
+  border-radius: 16px;
+  background: rgba(17, 24, 39, 0.05);
+  border: 1.5px dashed rgba(17, 24, 39, 0.3);
+  cursor: pointer;
+  transition: transform 0.2s var(--ease), background 0.2s, border-color 0.2s;
+}
+
+.stt-drop.drag {
+  transform: scale(1.01);
+  background: rgba(8, 127, 245, 0.12);
+  border-color: var(--blue);
+}
+
+.stt-art {
+  display: block;
+  width: min(72%, 202.5px);
+  height: auto;
+  margin: 0 auto 9px;
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+
+
+.stt-drop h3 {
+  margin: 0 0 2.5px;
+  font: 600 15px / 1.2 var(--serif);
+  letter-spacing: -0.1px;
+  color: rgb(4, 4, 4);
+}
+
+.stt-drop p {
+  margin: 0 0 12.5px;
+  font-size: 11.5px;
+  color: rgb(75, 85, 99);
+}
+
+.stt-touch {
+  display: none;
+}
+
+  .stt-touch {
+    display: inline;
+  }
+
+  .stt-desk {
+    display: none;
+  }
+
+
+.stt-btn {
+  height: 35px;
+  padding: 0 16px;
+  border-radius: 10.5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #111827;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 6px 12px -4px rgba(0, 0, 0, 0.3);
+}
+
+.stt-note {
+  margin-top: 10.5px;
+  font-size: 9px;
+  letter-spacing: 0.02em;
+  color: rgb(75, 85, 99);
+}
+
+/* ---------- chosen file ---------- */
+.stt-file {
+  padding: 8px 9px 9px;
+  background: rgba(242, 242, 244, 0.96);
+  border: 1px solid rgba(79, 79, 79, 0.3);
+  border-radius: 13px;
+  box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.25);
+  animation: up 0.22s var(--ease);
+}
+
+.stt-fhead {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.stt-ficon {
+  width: 38.5px;
+  height: 38.5px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  color: var(--blue);
+  background: rgba(8, 127, 245, 0.12);
+}
+
+.stt-ficon svg {
+  width: 19.5px;
+  height: 19.5px;
+}
+
+.stt-fmeta {
+  min-width: 0;
+  flex: 1;
+  text-align: left;
+}
+
+.stt-fmeta strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #111;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stt-fmeta small {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+  color: #4b5563;
+}
+
+.stt-x {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(17, 24, 39, 0.08);
+  color: #111827;
+  font-size: 17.5px;
+  line-height: 1;
+}
+
+#stt audio {
+  display: block;
+  width: 100%;
+  height: 35px;
+  margin-top: 9px;
+}
+
+.stt-go {
+  width: 100%;
+  height: 40.5px;
+  margin-top: 9px;
+  border-radius: 12.5px;
+  background: #087ff5;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 8px 18px -6px rgba(8, 127, 245, 0.55);
+}
+
+/* ---------- progress: reuses Naive's .load / .lring / .lt / .lc (see index.html) ---------- */
+.stt-hero > .load {
+  margin-top: 0;
+}
+
+/* ---------- error ---------- */
+.stt-err {
+  margin-top: 9px;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 9px 9px 9px 10.5px;
+  border-radius: 13px;
+  background: rgba(255, 240, 239, 0.96);
+  border: 1px solid rgba(255, 59, 48, 0.28);
+  animation: up 0.18s var(--ease);
+}
+
+.stt-err > i {
+  width: 24.5px;
+  height: 24.5px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 59, 48, 0.14);
+  color: #d92d20;
+  font: 700 13px / 1 var(--sans);
+  font-style: normal;
+}
+
+.stt-err div {
+  min-width: 0;
+  flex: 1;
+}
+
+.stt-err strong {
+  display: block;
+  font-size: 11.5px;
+  color: #7a1a14;
+}
+
+.stt-err p {
+  margin: 2px 0 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #b42318;
+  overflow-wrap: anywhere;
+}
+
+.stt-err .stt-x {
+  width: 24.5px;
+  height: 24.5px;
+  font-size: 16px;
+  background: rgba(180, 35, 24, 0.1);
+  color: #b42318;
+}
+
+/* ---------- result ---------- */
+.stt-rhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 9px;
+  padding: 2px 2px 9px;
+}
+
+.stt-rhead h2 {
+  margin: 0;
+  min-width: 0;
+  font: 400 var(--h3) / 1.15 var(--serif);
+  color: #ebebeb;
+}
+
+.stt-acts {
+  display: flex;
+  flex: none;
+  gap: 7px;
+}
+
+/* round white icon buttons (Naive's light pill look), icon only */
+.stt-ibtn {
+  position: relative;
+  width: 37px;
+  height: 37px;
+  display: grid;
+  place-items: center;
+  transition: transform 0.15s var(--ease), background 0.2s;
+}
+
+.stt-ibtn .stt-i {
+  color: rgb(233 233 233);
+  width: 20.5px;
+  height: 20.5px;
+  display: block;
+  object-fit: contain;
+  transition: opacity 0.12s;
+}
+
+/* the animated tick sits in the same spot as the copy icon and takes over for a moment */
+.stt-tick {
+  position: absolute;
+  inset: 5px;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.12s, transform 0.25s var(--spring);
+  pointer-events: none;
+  color: #1a9c4b;
+  font-weight: 700;
+}
+
+.stt-tick svg {
+  stroke: currentColor;
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+.stt-ibtn.copied {
+  background: #fff;
+  border-radius: 50%;
+}
+
+.stt-ibtn.copied .stt-i {
+  opacity: 0;
+}
+
+.stt-ibtn.copied .stt-tick {
+  opacity: 1;
+  transform: none;
+}
+
+#sttText {
+  display: block;
+  width: 100%;
+  min-height: 176px;
+  resize: vertical;
+  padding: 9px;
+  border-radius: 6px;
+  background: #ebebeb;
+  border: 1px solid rgb(75, 85, 99);
+  color: #232323;
+  font: 600 14px / 1.7 var(--sans); /* 16px: iPhones do not zoom in when you tap the text */
+  outline: none;
+}
+
+#sttText:focus {
+  border-color: rgba(90, 200, 250, 0.7);
+  box-shadow: 0 0 0 3px rgba(90, 200, 250, 0.18);
+}
+
+/* the transcript takes the font that suits its language */
+#sttText.f-en,
+#sttText.f-mix {
+  font-family: 'Bricolage Grotesque';
+  font-weight: 300;
+}
+
+#sttText.f-ur {
+  font-family: "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", "Segoe UI", serif;
+  direction: rtl;
+  text-align: right;
+  font-size: 14px;
+  line-height: 2.32;
+}
+
+#sttText.f-ar {
+  font-family: "Amiri Quran", "Amiri", "Traditional Arabic", "Segoe UI", serif;
+  direction: rtl;
+  text-align: right;
+  font-size: 19.5px;
+  line-height: 2.1;
+}
+
+.stt-rfoot {
+  padding: 03.5px 2px 0;
+}
+
+.stt-rfoot .stt-btn {
+  width: 100%;
+  height: 40.5px;
+  border-radius: 12.5px;
+  font-size: 13px;
+}
+
+/* ---------- small notice at the bottom ---------- */
+.stt-toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  z-index: 5;
+  max-width: calc(100% - 28px);
+  padding: 9px 14px;
+  border-radius: 87px;
+  background: rgba(34, 27, 33, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 6px 16px rgba(24, 12, 16, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 14px);
+  transition: opacity 0.2s, transform 0.3s var(--spring);
+}
+
+.stt-toast.on {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* ---------- bigger screens ---------- */
+
+
+/* phones held sideways: less vertical chrome */
+@media (max-height: 480px) and (orientation: landscape) {
+  .stt-drop {
+    padding: 10.5px 12.5px;
+  }
+
+  #sttText {
+    min-height: 141px;
+  }
+}
+
+/* once the transcript is ready the intro card steps aside so the text gets the room */
+#stt.has-result .stt-hero {
+  display: none;
+}
+
+#stt.has-result .stt-res {
+  margin-top: 0;
+}
+
+/* ---------- language dropdown (button look, native list so phones show their own picker) ---------- */
+.stt-select {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 31.5px;
+  max-width: 100%;
+  padding: 0 30px 0 12.5px;
+  border-radius: 87px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background-color: rgba(255, 255, 255, 0.92);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111827' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 11px center;
+  background-size: 14px;
+  color: #111827;
+  font: 600 12px / 1 var(--sans);
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.stt-select:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.stt-select option {
+  color: #111;
+  background: #fff;
+}
+
+.stt-langrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 9px;
+  margin-top: 9px;
+  padding: 0 2px;
+}
+
+.stt-langrow label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.stt-rfoot .stt-select {
+  height: 30px;
+  font-size: 11.5px;
+}
+
+/* Hindi transcripts: Bricolage has no Devanagari, so use a matching script font */
+#sttText.f-hi {
+  font-family: "Noto Sans Devanagari", "Nirmala UI", "Mangal", "Segoe UI", sans-serif;
+  font-size: 15px;
+  line-height: 1.9;
+}
+
+/* ---------- the "language does not match" message offers two ways forward ---------- */
+.stt-erract {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5.5px;
+  margin-top: 8px;
+}
+
+.stt-mini {
+  height: 30px;
+  padding: 0 12.5px;
+  border-radius: 87px;
+  background: #b42318;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.stt-mini.ghost {
+  background: rgba(180, 35, 24, 0.1);
+  color: #b42318;
+}
+
+/* ---------- spoken language: "Select" until a language is chosen ---------- */
+.stt-select.unset {
+  color: #6b7280;
+  border-color: rgb(237 0 0);
+  box-shadow: 0 0 6px 0px rgb(245 8 8 / 70%);
+}
+
+.stt-select.bad {
+  color: #b42318;
+  border-color: #d92d20;
+  box-shadow: 0 0 0 3px rgba(217, 45, 32, 0.16);
+}
+
+.stt-hint {
+  margin: 5.5px 2px 0;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #b42318;
+  text-align: right;
+  animation: up 0.18s var(--ease);
+}
+
+.stt-langrow.shake {
+  animation: stt-shake 0.38s ease-in-out;
+}
+
+@keyframes stt-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(3px); }
+}
+
+/* Transcribe looks off until a language is picked, but stays tappable so it can say what is missing */
+.stt-go[aria-disabled="true"] {
+  background: #9aa3b2;
+  box-shadow: none;
+  opacity: 0.85;
+}
+
+/* Download: white (#f0f0f0) icon like the header icon, so it sits on the same dark as "New recording" */
+#sttSave {
+  color: #e7e7e7;
+}

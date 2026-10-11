@@ -1,0 +1,2102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script>try { if (localStorage.getItem("naive.terms") !== "2026-10-04") document.documentElement.classList.add("gate"); } catch (e) { document.documentElement.classList.add("gate"); }</script>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#000f3f">
+  <meta name="apple-mobile-web-app-title" content="Naive">
+  <link rel="preload" href="/fonts/crimson-pro.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin>
+  <title>Naive</title>
+  <script>
+    document.documentElement.dataset.t = localStorage.t || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
+  </script>
+  <style>
+    /* one variable font for the whole app: weight 200-800, width 75-100, optical size 12-96 (auto) */
+    @font-face { font-family: "Crimson Pro"; font-style: normal; font-weight: 200 900; font-display: swap; size-adjust: 112%; src: url(/fonts/crimson-pro.woff2) format("woff2"); }
+    @font-face { font-family: "Bricolage Grotesque"; font-style: normal; font-weight: 300 800; font-display: swap; src: url(/fonts/bricolage-grotesque.woff2) format("woff2"); }
+
+    /* ============ design tokens: phone first, then larger screens ============ */
+    :root {
+      --txt: #fff;
+      --muted: rgba(255, 255, 255, 0.62);
+      --glass: rgba(91, 62, 63, 0.38);
+      --glass2: rgba(255, 255, 255, 0.17);
+      --line: rgba(255, 255, 255, 0.2);
+      --blue: #087ff5;
+      --green: #35c96d;
+      --red: #ff5b57;
+      --shadow: 0 8px 18px -8px rgba(0, 0, 0, 0.35);
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+      --serif: "Bricolage Grotesque", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", system-ui, sans-serif;
+      --sans: "Crimson Pro", "Crimson Text", Georgia, "Times New Roman", serif;
+
+      --pad: 12.5px; /* page side padding */
+      --r: 19.5px; /* big card radius */
+      --hero-pad: 18px 16px 16px;
+      --panel-pad: 14px 12px 12px;
+      --h1: 24px; /* app name */
+      --h2: 24.5px; /* hero headline (max) */
+      --h3: 19.5px; /* section titles */
+      --logo: 33.5px;
+      --top-h: 40.5px;
+      --t-body: 12.5px;
+      --tab-h: 51px;
+    }
+
+
+
+
+
+    @media (max-width: 359px) {
+      :root {
+        --pad: 9.5px;
+        --hero-pad: 15px 13px 13px;
+        --panel-pad: 12px 10px 10px;
+        --h1: 21px;
+        --h3: 17.5px;
+        --logo: 30px;
+        --t-body: 12px;
+      }
+    }
+
+    [data-t=dark] {
+      --glass: rgba(20, 19, 23, 0.5);
+      --glass2: rgba(255, 255, 255, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    html {
+      background: #10121f;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      min-height: 100svh;
+      color: var(--txt);
+      font: var(--t-body) / 1.45 var(--sans);
+      text-align: justify;
+      -webkit-hyphens: auto;
+      hyphens: auto;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    body:before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: radial-gradient(35% 25% at 20% 80%, rgba(255, 255, 255, 0.2), transparent), radial-gradient(30% 25% at 78% 70%, rgba(255, 255, 255, 0.1), transparent), linear-gradient(270deg, #000f3f, #474747, #3b000dfa);
+      transform: translateZ(0);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+      color: inherit;
+    }
+
+    button {
+      border: 0;
+      background: none;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    button:active {
+      transform: scale(0.96);
+      opacity: 0.82;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    /* icons: one inline sprite (svg symbols at the top of <body>); they take the text colour */
+    .ic {
+      display: block;
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+      flex: none;
+      pointer-events: none;
+    }
+
+    /* ============ layout ============ */
+    .app {
+      width: min(100%, 480px);
+      min-height: 100svh;
+      margin: auto;
+      padding: calc(10px + env(safe-area-inset-top)) var(--pad) calc(var(--tab-h) + 30px + env(safe-area-inset-bottom));
+    }
+
+    .top {
+      height: var(--top-h);
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 9px;
+    }
+
+    .logo {
+      width: var(--logo);
+      height: var(--logo);
+      flex: none;
+      display: grid;
+      place-items: center;
+    }
+
+    .logo img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font: 600 var(--h1) / 1 var(--serif);
+      letter-spacing: -0.3px;
+      color: #fff;
+    }
+
+    .brand p {
+      margin: 2px 0 0;
+      font-size: 9px;
+      color: var(--muted);
+    }
+
+
+
+    /* ============ hero ============ */
+    .hero {
+      border-radius: var(--r);
+      padding: var(--hero-pad);
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: var(--shadow), inset 0 1px rgba(255, 255, 255, 0.35);
+    }
+
+    .hero h2 {
+      margin: 0 0 5.5px;
+      font: 600 clamp(21px, 7.2vw, var(--h2)) / 1.15 var(--serif);
+      letter-spacing: -0.2px;
+      color: rgb(4, 4, 4);
+    }
+
+    .hero > p {
+      margin: 0 0 10.5px;
+      color: rgb(75, 85, 99);
+      font-size: var(--t-body);
+      font-weight: 400;
+      line-height: 1.45;
+    }
+
+    .srcs {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 4.5px;
+      margin: 0 -2px 10.5px;
+      padding: 0 2px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .srcs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .srcs span {
+      flex: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4.5px;
+      padding: 3.5px 7px;
+      border-radius: 87px;
+      background: rgba(17, 24, 39, 0.07);
+      border: 1px solid rgba(17, 24, 39, 0.09);
+      color: rgb(55, 65, 81);
+      font-size: 9px;
+      font-weight: 600;
+    }
+
+
+
+    .srcs i {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      display: block;
+    }
+
+    .search {
+      min-height: 46px;
+      display: flex;
+      align-items: center;
+      gap: 5.5px;
+      padding: 4.5px 4.5px 4.5px 10.5px;
+      border-radius: 14px;
+      background: rgba(80, 80, 84, 0.55);
+      border: 1px solid rgba(79, 79, 79, 0.76);
+      box-shadow: inset 0 1px rgba(255, 255, 255, 0.17);
+    }
+
+    .search > svg {
+      width: 15px;
+      height: 15px;
+      flex: none;
+      color: rgb(205 205 205);
+    }
+
+    .search input {
+      flex: 1;
+      min-width: 0;
+      height: 35px;
+      background: transparent;
+      border: 0;
+      outline: 0;
+      font-size: 13px; /* 16px stops iPhones from zooming in when you tap the box */
+      color: #fff;
+    }
+
+    .search input::placeholder {
+      color: rgba(255, 255, 255, 0.66);
+    }
+
+    .paste,
+    .go,
+    .lc,
+    .sec {
+      height: 35px;
+      border-radius: 10.5px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5.5px;
+    }
+
+    .paste {
+      min-width: 35px;
+      padding: 0 9.5px;
+      background: #111827;
+      color: #fff;
+      box-shadow: 0 6px 12px -4px rgba(0, 0, 0, 0.3);
+    }
+
+    .paste svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    .paste span {
+      display: none;
+    }
+
+    .go,
+    .sec {
+      padding: 0 13px;
+      background: rgba(255, 255, 255, 0.86);
+      color: rgb(31, 41, 55);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+
+    .go:disabled {
+      opacity: 0.5;
+    }
+
+    .sec {
+      height: 30px;
+      border-radius: 87px;
+      font-size: 11px;
+      padding: 0 11.5px;
+      border: 1px solid rgb(51 51 51 / 46%);
+    }
+
+
+
+    @media (max-width: 349px) {
+      .go .lg {
+        display: none;
+      }
+    }
+
+    #msg {
+      color: #b42318;
+      font-size: 11px;
+      font-weight: 500;
+      margin: 7px 3.5px 0;
+    }
+
+    #msg:empty {
+      display: none;
+    }
+
+    .chips {
+      display: flex;
+      gap: 5.5px;
+      overflow-x: auto;
+      padding: 8px 1px 1px;
+      scrollbar-width: none;
+    }
+
+    .chips::-webkit-scrollbar {
+      display: none;
+    }
+
+    .chip {
+      flex: none;
+      max-width: 190px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding: 5.5px 10.5px;
+      border-radius: 87px;
+      background: rgba(17, 24, 39, 0.08);
+      border: 1px solid rgba(17, 24, 39, 0.06);
+      color: rgb(55, 65, 81);
+      font-size: 10.5px;
+    }
+
+    /* lookup progress card */
+    .load {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-top: 9px;
+      padding: 8px 9px;
+      background: rgba(242, 242, 244, 0.96);
+      border: 1px solid rgba(79, 79, 79, 0.3);
+      border-radius: 13px;
+      box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.25);
+      animation: up 0.22s var(--ease);
+    }
+
+    .lring {
+      width: 38.5px;
+      height: 38.5px;
+      position: relative;
+      flex: none;
+    }
+
+    .lring svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .lring b {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: 9.5px;
+      color: #111;
+    }
+
+    .tr {
+      stroke: rgba(0, 106, 231, 0.14);
+    }
+
+    .pg {
+      stroke: #00a1db;
+      transition: stroke-dashoffset 0.2s linear;
+    }
+
+    .lt {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .lt strong {
+      display: block;
+      font: 600 13px / 1.2 var(--serif);
+      color: #111;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .lt small {
+      display: block;
+      margin-top: 2px;
+      font-size: 10px;
+      color: #4b5563;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .lc {
+      height: 30px;
+      padding: 0 11.5px;
+      border-radius: 9.5px;
+      background: #111827;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    /* ============ section titles + result cards ============ */
+    .section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 9px;
+      padding: 16px 2px 8px;
+    }
+
+    .section h2 {
+      margin: 0;
+      font: 600 var(--h3) / 1.15 var(--serif);
+      letter-spacing: -0.3px;
+      color: #fff;
+    }
+
+    .section small {
+      display: block;
+      margin-top: 3.5px;
+      font: 400 10px / 1.2 var(--sans);
+      letter-spacing: 0.1px;
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+    }
+
+    .card {
+      content-visibility: auto;
+      contain-intrinsic-size: auto 150px;
+      text-align: left;
+      overflow: hidden;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      transition: transform 0.2s var(--ease);
+    }
+
+    .tw {
+      aspect-ratio: 16 / 9;
+      position: relative;
+      background: rgba(0, 0, 0, 0.13);
+    }
+
+    .tw img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .tw i {
+      position: absolute;
+      right: 6px;
+      bottom: 6px;
+      padding: 2.5px 5.5px;
+      border-radius: 5.5px;
+      background: rgba(0, 0, 0, 0.62);
+      font: 600 9px var(--sans);
+      font-style: normal;
+    }
+
+    .cb {
+      padding: 7px 9px 9px;
+    }
+
+    .cb b {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .cb span {
+      display: block;
+      margin-top: 2.5px;
+      color: var(--muted);
+      font-size: 9.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+
+
+    /* ============ downloads ============ */
+    .downloads {
+      border-radius: var(--r);
+      padding: var(--panel-pad);
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: var(--shadow), inset 0 1px rgba(255, 255, 255, 0.35);
+    }
+
+    .downloads .section {
+      padding: 2px 2px 9px;
+    }
+
+    .downloads .section h2 {
+      color: #1b1b1b;
+    }
+
+    .downloads .section small {
+      color: rgba(20, 20, 20, 0.66);
+    }
+
+    .seg {
+      display: flex;
+      padding: 1px;
+      border-radius: 12.5px;
+      background: rgb(0 0 0 / 36%);
+      margin-bottom: 9px;
+      border: 1px solid rgb(51 51 51 / 60%);
+    }
+
+    .seg button {
+      flex: 1;
+      height: 30px;
+      border-radius: 9.5px;
+      color: rgb(255 255 255);
+      font-size: 12.5px;
+      font-weight: 300;
+    }
+
+    .seg button.on {
+      background: rgba(255, 255, 255, 0.86);
+      color: rgb(0 0 0);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .list {
+      overflow: hidden;
+      border-radius: 14px;
+      background: rgba(0, 0, 0, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .row {
+      content-visibility: auto;
+      contain-intrinsic-size: auto 56px;
+      contain: layout style;
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr) auto;
+      gap: 9px;
+      align-items: center;
+      padding: 8px 9px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .row.fresh { animation: up 0.22s var(--ease); }
+
+    .row:first-child {
+      border-top: 0;
+    }
+
+    .thw {
+      position: relative;
+      width: 38.5px;
+      height: 38.5px;
+    }
+
+    .th {
+      width: 38.5px;
+      height: 38.5px;
+      display: block;
+      border-radius: 9px;
+      object-fit: cover;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    /* little status badge on the thumbnail (animated check / info icons) */
+    .bdg {
+      position: absolute;
+      right: -5px;
+      bottom: -5px;
+      width: 18.5px;
+      height: 18.5px;
+      border-radius: 50%;
+      display: none;
+      overflow: hidden;
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+    }
+
+    .bdg > * {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .row.done .bdg.check {
+      display: block;
+      background: #62ff7e;
+    }
+
+    .row.error .bdg.info {
+      display: block;
+      background: #b42318;
+    }
+
+    .fi {
+      min-width: 0;
+    }
+
+    .fn {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.28;
+      text-decoration: none;
+      overflow-wrap: anywhere;
+    }
+
+    .fi small {
+      display: block;
+      margin-top: 2.5px;
+      font-size: 10px;
+      line-height: 1.3;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.82);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .row.error .fi small {
+      color: #ffc9c4;
+      -webkit-line-clamp: 3;
+    }
+
+    .st {
+      display: flex;
+      align-items: center;
+      gap: 5.5px;
+    }
+
+    /* App Store style progress ring: iOS-blue arc on a soft track, pause / play in the middle */
+    .ring {
+      width: 30px;
+      height: 30px;
+      position: relative;
+      flex: none;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 3px 10px rgba(20, 8, 12, 0.22), inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+      transition: transform 0.15s var(--ease);
+    }
+
+    .ring:active {
+      transform: scale(0.9);
+    }
+
+    .ring svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .ring .tr {
+      stroke: rgba(10, 132, 255, 0.2);
+    }
+
+    .ring .pg {
+      stroke: url(#rg);
+      transition: stroke-dashoffset 0.2s linear, opacity 0.15s;
+    }
+
+    .ring .g {
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      width: 9.5px;
+      height: 9.5px;
+      color: #0a84ff;
+      transform: none;
+    }
+
+    .ring .g-play {
+      display: none;
+      transform: translateX(1px);
+    }
+
+    .row.paused .ring .g-pause {
+      display: none;
+    }
+
+    .row.paused .ring .g-play {
+      display: block;
+    }
+
+    .row.paused .ring .pg {
+      opacity: 0.55;
+    }
+
+    .row.queued .ring .pg {
+      opacity: 0;
+    }
+
+    .pc {
+      font-size: 9.5px;
+      font-variant-numeric: tabular-nums;
+      color: rgba(255, 255, 255, 0.85);
+      min-width: 26.5px;
+      text-align: right;
+    }
+
+    .xb {
+      width: 24.5px;
+      height: 24.5px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      flex: none;
+      font-size: 16px;
+      line-height: 1;
+      color: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .ib,
+    .rm {
+      display: none;
+      width: 30px;
+      height: 30px;
+      place-items: center;
+      color: rgb(255 255 255);
+    }
+
+    .ib .ic,
+    .rm .ic {
+      width: 15.5px;
+      height: 15.5px;
+    }
+
+    .rm .ic {
+      width: 15.5px;
+      height: 15.5px;
+    }
+
+    .row.done .ib,
+    .row.done .rm,
+    .row.error .rm {
+      display: grid;
+    }
+
+    .row.done .xb,
+    .row.error .xb,
+    .row.done .ring,
+    .row.error .ring,
+    .row.done .pc,
+    .row.error .pc {
+      display: none;
+    }
+
+    #jobs[data-f=active] .row.done,
+    #jobs[data-f=active] .row.error,
+    #jobs[data-f=done] .row:not(.done) {
+      display: none;
+    }
+
+    .empty {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.78);
+      padding: 26.5px 12.5px;
+      font-size: 11.5px;
+    }
+
+    .empty .ic {
+      color: rgb(205 205 205);
+      width: 28px;
+      height: 28px;
+      margin: 0 auto 7px;
+      opacity: 0.6;
+    }
+
+    .empty p {
+      margin: 0;
+    }
+
+    /* ============ bottom tab bar ============ */
+    .tab {
+      position: fixed;
+      z-index: 50;
+      left: 0;
+      right: 0;
+      width: calc(100% - 24px);
+      max-width: 456px;
+      margin: 0 auto;
+      bottom: calc(8px + env(safe-area-inset-bottom));
+      height: var(--tab-h);
+      padding: 4.5px;
+      display: flex;
+      gap: 3.5px;
+      border-radius: 21px;
+      background: rgba(30, 24, 30, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 6px 16px rgba(24, 12, 16, 0.35);
+      will-change: transform;
+      transform: translateZ(0);
+    }
+
+    .tab button {
+      position: relative;
+      flex: 1;
+      display: grid;
+      place-items: center;
+      align-content: center;
+      gap: 1px;
+      border-radius: 16.5px;
+      color: rgb(205 205 205);
+      font-size: 9.5px;
+      font-weight: 500;
+      line-height: 1.1;
+      white-space: nowrap;
+      touch-action: manipulation;
+    }
+
+    .tab button:active { transform: none; opacity: 1; } /* no press animation on the bottom tab buttons */
+
+    .tab button.on {
+      background: #fff;
+      color: #0f172a;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .lot,
+    .tab .ic {
+      width: 21px;
+      height: 21px;
+      display: block;
+    }
+
+    .tab em {
+      position: absolute;
+      top: 5px;
+      right: calc(50% - 19px);
+      background: #ff454d;
+      color: #fff;
+      font: 700 8px var(--sans);
+      padding: 2px 4.5px;
+      min-width: 14px;
+      border-radius: 87px;
+      font-style: normal;
+    }
+
+    /* ============ quality sheet ============ */
+    dialog {
+      width: min(520px, calc(100% - 16px));
+      max-width: none;
+      max-height: 90svh;
+      margin: auto;
+      padding: 0;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 23px;
+      background: rgba(38, 30, 34, 0.97);
+      color: #fff;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+    }
+
+    dialog:focus,
+    .db:focus,
+    dialog button:focus:not(:focus-visible) {
+      outline: none;
+    }
+
+    button:focus-visible {
+      outline: 2px solid #5ac8fa;
+      outline-offset: 2px;
+    }
+
+    dialog[open] {
+      display: flex;
+      flex-direction: column;
+      animation: sheet 0.4s var(--ease);
+    }
+
+    dialog::backdrop {
+      background: rgba(15, 8, 10, 0.4);
+    }
+
+    /* on phones the sheet slides up from the bottom edge, like iOS */
+      dialog {
+        border-radius: var(--r);
+        padding: 1px;
+        background: rgba(246, 246, 248, 0.97);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        box-shadow: var(--shadow), inset 0 1px rgba(255, 255, 255, 0.35);
+      }
+    
+
+
+    .grab {
+      width: 35px;
+      height: 4.5px;
+      flex: none;
+      border-radius: 87px;
+      background: rgb(39 39 39 / 47%);
+      margin: 7px auto 0;
+    }
+
+    .dt {
+      display: flex;
+      gap: 10.5px;
+      padding: 9px 14px 10.5px;
+      align-items: center;
+    }
+
+    .pv {
+      width: 102px;
+      flex: none;
+      border-radius: 10.5px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .dt.v .pv {
+      width: 63.5px;
+    }
+
+    .pv img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .dt > div:last-child {
+      min-width: 0;
+    }
+
+    .dt b {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      font-size: 13px;
+      font-weight: 500;
+      color: rgb(0 0 0);
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .dt span {
+      display: block;
+      color: rgb(0 0 0);
+      font-size: 10.5px;
+      margin-top: 3.5px;
+    }
+
+
+
+    /* phones held sideways: keep the preview small so the quality list stays visible */
+    @media (max-height: 520px) {
+      dialog {
+        width: min(640px, calc(100% - 16px));
+      }
+
+      .dt:not(.v) {
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .dt:not(.v) .pv {
+        width: 102px;
+      }
+
+      .dt b {
+        font-size: 13px;
+      }
+    }
+
+    .db {
+      overflow: auto;
+      padding: 0 14px;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .opts {
+      border-radius: 8px;
+      overflow: hidden;
+      background: rgb(235 235 235);
+      border: 1px solid rgb(117 117 117 / 66%);
+      color: #000000;
+    }
+
+    .opt {
+      min-height: 40.5px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 11.5px;
+      border-top: 1px solid rgb(43 43 43 / 10%);
+      font-size: 12.5px;
+    }
+
+    .opt.rec { background: #19ff192b; }
+
+    .opt input {
+      display: none;
+    }
+
+    .opt:before {
+      content: "";
+      width: 17.5px;
+      height: 17.5px;
+      flex: none;
+      border-radius: 50%;
+      border: 1.5px solid rgb(0 0 0 / 83%);
+    }
+
+    .opt:has(input:checked):before {
+      background: #087ff5;
+      border-color: #087ff5;
+      box-shadow: inset 0 0 0 4px #fff;
+    }
+
+    .opt em {
+      margin-left: auto;
+      color: var(--muted);
+      font-style: normal;
+      font-size: 9.5px;
+    }
+
+    .tag {
+      background: #35c96d;
+      color: #fff;
+      font-size: 9px;
+      font-weight: 600;
+      padding: 2.5px 6px;
+      border-radius: 5.5px;
+    }
+
+    .set {
+      margin-top: 7px;
+      border-radius: 13px;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .set label {
+      min-height: 40.5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 11.5px;
+      border-top: 1px solid rgba(255, 255, 255, 0.09);
+      font-size: 12.5px;
+    }
+
+    .set label:first-child {
+      border-top: 0;
+    }
+
+    .db2 {
+      flex: none;
+      display: flex;
+      gap: 7px;
+      margin-top: 10.5px;
+      padding: 10px 16px calc(12px + env(safe-area-inset-bottom));
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    .db2 button {
+      height: 40.5px;
+      border-radius: 12.5px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .cancel {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.8);
+      color: rgb(4, 4, 4);
+    }
+
+    .download {
+      flex: 2;
+      background: #087ff5;
+      color: #fff;
+    }
+
+    /* ============ toasts ============ */
+    #toasts {
+      position: fixed;
+      z-index: 100;
+      top: calc(8px + env(safe-area-inset-top));
+      left: 0;
+      right: 0;
+      width: calc(100% - 20px);
+      max-width: 460px;
+      margin: 0 auto;
+      display: grid;
+      gap: 6px;
+    }
+
+    .toast {
+      padding: 9.5px 11.5px;
+      border-radius: 16.5px;
+      background: rgba(46, 36, 38, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.17);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+    }
+
+    .tt {
+      display: flex;
+      justify-content: space-between;
+      color: #70e79a;
+      font-size: 10.5px;
+      font-weight: 650;
+    }
+
+    .tn {
+      font-size: 11.5px;
+      font-weight: 650;
+      margin-top: 2.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tp {
+      color: var(--muted);
+      font-size: 9px;
+    }
+
+    .ta {
+      margin-top: 4.5px;
+    }
+
+    .ta button,
+    .ta a {
+      color: #70b9ff;
+      font-size: 10.5px;
+      font-weight: 650;
+      text-decoration: none;
+    }
+
+    .pane {
+      display: none;
+    }
+
+    .pane.on {
+      display: block;
+    }
+
+    /* fast tab switching: the hidden page stays prepared (not drawn) instead of being rebuilt each time */
+    @supports (content-visibility: hidden) {
+      .pane { display: block; content-visibility: hidden; }
+      .pane.on { content-visibility: visible; }
+    }
+
+    @keyframes up {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.98);
+      }
+    }
+
+    @keyframes sheet {
+      from {
+        opacity: 0;
+        transform: translateY(45px) scale(0.98);
+      }
+    }
+
+    /* ============ tablets and desktop ============ */
+
+
+    /* phones held sideways: less vertical chrome */
+    @media (max-height: 480px) and (orientation: landscape) {
+      :root {
+        --tab-h: 42px;
+        --top-h: 35px;
+      }
+
+      .tab button .lot,
+      .tab button .ic {
+        width: 19.5px;
+        height: 19.5px;
+      }
+
+      dialog {
+        max-height: 94svh;
+      }
+
+      .dt {
+        padding-block: 5.5px;
+      }
+    }
+
+
+    /* ============ v2: logos, search, update, motion ============ */
+    :root { --spring: cubic-bezier(0.34, 1.45, 0.5, 1); }
+    .srcs { justify-content: flex-start; gap: 14px; margin: 2px 0 14px; padding: 2px; overflow: visible; }
+    .srcs img { width: 32px; height: 32px; display: block; }
+    .search { padding: 4px 5px 4px 12px; }
+    .search .go { width: 34px; min-width: 34px; height: 34px; padding: 0; border-radius: 11px; flex: none; background: #111827; color: rgb(205 205 205); border: 0; font-size: 12px; gap: 5px; box-shadow: none; }
+    .search .go svg { width: 15px; height: 15px; flex: none; }
+    .search .go .x { display: none; }
+    .search .go[data-m="x"] { width: 34px; padding: 0; background: rgba(255, 255, 255, 0.2); }
+    .search .go[data-m="x"] .x { display: block; }
+    .search .go[data-m="x"] .pi, .search .go[data-m="x"] span { display: none; }
+
+    /* top-left menu: icon-only dropdown (Speech to Text, Website, Update) */
+    .mwrap { position: relative; flex: none; margin-left: auto; }
+    .mbtn, .mitem { position: relative; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 12px; color: rgb(205 205 205); }
+    .mbtn .ic, .mitem .ic { width: 21px; height: 21px; }
+    .mdot { position: absolute; top: 3px; right: 3px; width: 9px; height: 9px; border-radius: 50%; background: #ff3b30; box-shadow: 0 0 0 2px #1a1c2b; }
+    .mmenu { position: absolute; top: calc(100% + 6px); right: 0; z-index: 30; display: flex; flex-direction: column; gap: 2px; padding: 5px; background: rgba(30, 24, 30, 0.97); border-radius: 15px; box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4); transform-origin: calc(100% - 18px) 0; animation: menuIn 0.16s var(--ease); }
+    .mmenu[hidden] { display: none; }
+    .mmenu.closing { animation: menuOut 0.12s ease-in forwards; pointer-events: none; }
+    .mitem:active { background: rgba(255, 255, 255, 0.12); }
+    .mitem.spin > .ic { animation: spin 0.6s var(--ease); }
+    @keyframes menuIn { from { opacity: 0; transform: scale(0.88) translateY(-6px); } }
+    @keyframes menuOut { to { opacity: 0; transform: scale(0.92) translateY(-4px); } }
+    .stt-newbtn { width: 42px; height: 36px; display: grid; place-items: center; background: none; border: 0; padding: 0; color: rgb(235 235 235); }
+    .stt-newbtn .ic { width: 28px; height: 28px; }
+    .stt-newbtn:active { transform: none; opacity: 1; }
+    .bell { position: absolute; top: -4px; right: -4px; width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; background: #ff3b30; color: #fff; box-shadow: 0 0 0 2px #1a1c2b; transform-origin: 50% 15%; animation: ring 2.2s ease-in-out infinite; }
+    .bell svg { width: 11px; height: 11px; fill: currentColor; }
+    .ub { padding: 26px 22px 8px; text-align: center; }
+    .ub h3 { margin: 10px 0 6px; font: 600 22px/1.2 var(--serif); color: rgb(4, 4, 4); }
+    .ub p { margin: 0; color: rgb(0 0 0 / 84%); font-size: 14px; line-height: 1.5; }
+    .ub small { opacity: 0.8; }
+    .ui { width: 64px; height: 64px; margin: auto; display: grid; place-items: center; border-radius: 50%; background: rgba(10, 132, 255, 0.2); color: #5ac8fa; }
+    .ui svg { width: 30px; height: 30px; }
+    .ui.ok { background: #fff; }
+    .lot svg { width: 100%; height: 100%; display: block; }
+    #udlg .db2 { padding: 16px 14px calc(14px + env(safe-area-inset-bottom)); }
+    #udlg .db2 button { flex: 1; }
+    .bdg { width: 24px; height: 24px; right: -6px; bottom: -6px; }
+    .toast { display: flex; align-items: center; gap: 11px; animation: toastIn 0.4s var(--spring); }
+    .toast.out { animation: toastOut 0.2s ease-in forwards; }
+    .toast .tm { min-width: 0; flex: 1; }
+    .toast .tt { justify-content: flex-start; }
+    .tk { width: 38px; height: 38px; flex: none; border-radius: 50%; background: #fff; }
+
+
+    /* motion: light and fast. Only opacity + transform (GPU), every animation under 0.3s */
+    .app, .tab { animation: fadeIn 0.2s ease both; }
+    .hero > .load, .hero > #msg { animation: up 0.16s var(--ease); }
+    dialog[open] { animation: sheetIn 0.24s var(--ease); }
+    dialog[open]::backdrop { animation: fadeIn 0.24s ease; }
+    dialog[open].closing { animation: sheetOut 0.18s ease-in forwards; pointer-events: none; }
+    dialog[open].closing::backdrop { animation: fadeOut 0.18s ease-in forwards; }
+    .row.leaving { animation: rowOut 0.18s ease-in forwards; pointer-events: none; }
+    @keyframes paneIn { from { opacity: 0; transform: translateY(8px); } }
+    @keyframes sheetIn { from { opacity: 0; transform: translateY(30px) scale(0.97); } }
+    @keyframes sheetOut { to { opacity: 0; transform: translateY(26px) scale(0.97); } }
+    @keyframes fadeIn { from { opacity: 0; } }
+    @keyframes fadeOut { to { opacity: 0; } }
+    @keyframes rowOut { to { opacity: 0; transform: translateX(28px); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes ring { 0%, 55%, 100% { transform: rotate(0); } 10% { transform: rotate(16deg); } 20% { transform: rotate(-14deg); } 30% { transform: rotate(10deg); } 40% { transform: rotate(-7deg); } 50% { transform: rotate(3deg); } }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(-22px) scale(0.96); } }
+    @keyframes toastOut { to { opacity: 0; transform: translateY(-16px) scale(0.97); } }
+    @keyframes draw { to { stroke-dashoffset: 0; } }
+    body.ready .app, body.ready .tab { animation: none; }
+
+    /* small drawn icons (tick / info): plain SVG + CSS, no animation library */
+    .chk { width: 100%; height: 100%; display: block; stroke: currentColor; }
+    .chk path { stroke-dasharray: 30; stroke-dashoffset: 30; animation: draw 0.34s 0.04s var(--ease) forwards; }
+    .chk.s path { animation: none; stroke-dashoffset: 0; }
+    .bdg { color: #0a3d1c; padding: 4px; }
+    .bdg.info { color: #fff; padding: 3px; }
+    .tk { color: #1fb85a; padding: 8px; }
+    .ui.ok { color: #1fb85a; }
+
+    /* clean quality rows + "good quality" icon */
+    .opt .rs { color: rgb(69 69 69); font-size: 12.5px; margin-left: 2px; }
+    .opt .gq { width: 34px; height: 34px; margin-left: auto; flex: none; }
+
+    /* ---- first-launch agreement: shown before the home screen until the user agrees ---- */
+    #gate { display: none; position: fixed; inset: 0; z-index: 100; align-items: center; justify-content: center; padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); background: linear-gradient(270deg, #000f3f, #474747, #3b000dfa); overflow: auto; overscroll-behavior: contain; }
+    html.gate #gate { display: flex; animation: fadeIn 0.22s ease; }
+    html.gate .app, html.gate .tab, html.gate #toasts { display: none !important; }
+    #gate.closing { animation: fadeOut 0.2s ease-in forwards; pointer-events: none; }
+    .gcard { width: min(100%, 380px); margin: auto; background: rgba(246, 246, 248, 0.97); color: #111827; border-radius: 22px; padding: 22px 18px 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); display: flex; flex-direction: column; gap: 12px; animation: sheetIn 0.26s var(--ease); }
+    .gcard img.glogo { width: 50px; height: 50px; margin: 0 auto 2px; display: block; }
+    .gcard h1 { margin: 0; font: 700 21px/1.1 var(--serif); text-align: center; letter-spacing: -0.01em; }
+    .gcard p { margin: 0; font-size: 12.5px; line-height: 1.55; color: #374151; text-align: center; }
+    .gcard .glink { color: #1d4ed8; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; background: none; border: 0; padding: 0; font: inherit; }
+    .gnote { background: rgba(25, 255, 25, 0.16); border-left: 3px solid #16a34a; border-radius: 10px; padding: 9px 11px; font-size: 12.5px; line-height: 1.5; font-weight: 600; color: #14532d; }
+    .gchk { display: flex; align-items: flex-start; gap: 10px; font-size: 12.5px; line-height: 1.45; color: #111827; cursor: pointer; padding: 4px 0; }
+    .gchk input { appearance: none; -webkit-appearance: none; flex: none; width: 20px; height: 20px; margin: 0; border: 2px solid #6b7280; border-radius: 6px; background: #fff; display: grid; place-items: center; transition: background 0.12s, border-color 0.12s; }
+    .gchk input:checked { background: #111827; border-color: #111827; }
+    .gchk input:checked::after { content: ""; width: 9px; height: 5px; border-left: 2.4px solid #fff; border-bottom: 2.4px solid #fff; transform: translateY(-1px) rotate(-45deg); }
+    .gbtns { display: flex; gap: 10px; margin-top: 2px; }
+    .gbtns button { flex: 1; height: 42px; border-radius: 13px; border: 0; font: 700 13px var(--sans); cursor: pointer; transition: opacity 0.12s, transform 0.1s; }
+    .gbtns button:active { transform: scale(0.97); }
+    #gExit { background: #e5e7eb; color: #111827; }
+    #gOk { background: #111827; color: #fff; flex: 1.6; }
+    #gOk:disabled { opacity: 0.4; cursor: default; transform: none; }
+    .gdeny { text-align: center; display: flex; flex-direction: column; gap: 10px; }
+    .gdeny[hidden], .gmain[hidden] { display: none; }
+    .gmain { display: flex; flex-direction: column; gap: 12px; }
+    .gt { position: fixed; inset: 0; z-index: 101; background: #f6f6f8; color: #111827; display: flex; flex-direction: column; animation: sheetIn 0.22s var(--ease); }
+    .gt[hidden] { display: none; }
+    .gth { display: flex; align-items: center; gap: 10px; padding: max(10px, env(safe-area-inset-top)) 12px 10px; border-bottom: 1px solid #e5e7eb; }
+    .gth button { height: 34px; padding: 0 14px; border-radius: 11px; border: 0; background: #111827; color: #fff; font: 700 12px var(--sans); cursor: pointer; }
+    .gth b { font-size: 13px; }
+    .gtb { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 14px 16px calc(24px + env(safe-area-inset-bottom)); font-size: 12.5px; line-height: 1.6; color: #1f2937; }
+    .gtb h1 { font: 700 17px/1.2 var(--serif); margin: 0 0 8px; }
+    .gtb h2 { font: 700 14px/1.25 var(--serif); margin: 20px 0 6px; }
+    .gtb h3 { font: 700 13px/1.3 var(--serif); margin: 14px 0 4px; }
+    .gtb h4 { font: 700 12.5px/1.3 var(--serif); margin: 10px 0 4px; }
+    .gtb p { margin: 0 0 9px; }
+    .gtb ul { margin: 0 0 9px; padding-left: 18px; }
+    .gtb blockquote { margin: 0 0 9px; padding: 8px 11px; border-left: 3px solid #9ca3af; background: #eceef1; border-radius: 8px; }
+    .gtb hr { border: 0; border-top: 1px solid #e5e7eb; margin: 14px 0; }
+
+    /* nothing in the app can be selected, copied, held or dragged, except the search box and the transcript box */
+    *, *::before, *::after { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-user-drag: none; user-drag: none; }
+    .search input, #sttText { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+    img, svg, .lot, .ic, canvas { pointer-events: none; }
+    a { -webkit-user-drag: none; }
+
+    /* Discover: tree animation under the hero, a little see-through so it sits in the background */
+    .tree { width: min(78%, 300px); aspect-ratio: 500 / 380; margin: 12px auto 0; opacity: 0.62; pointer-events: none; }
+    .tree img { width: 100%; height: 100%; display: block; }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="/stt.css">
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="i-home" viewBox="0 0 24 24"><path d="M22.702,8.948L15.01,1.154c-1.717-1.542-4.303-1.543-6.042,.021L1.297,8.948c-.836,.849-1.297,1.971-1.297,3.161v8.391c0,1.93,1.57,3.5,3.5,3.5H20.5c1.93,0,3.5-1.57,3.5-3.5V12.109c0-1.19-.461-2.313-1.298-3.161Zm-6.702,14.052H8v-6c0-2.206,1.794-4,4-4s4,1.794,4,4v6Zm7-2.5c0,1.379-1.121,2.5-2.5,2.5h-3.5v-6c0-2.757-2.243-5-5-5s-5,2.243-5,5v6H3.5c-1.378,0-2.5-1.121-2.5-2.5V12.109c0-.926,.358-1.799,1.009-2.458L9.659,1.898c.67-.604,1.511-.903,2.349-.903,.831,0,1.658,.295,2.312,.883l7.671,7.773c.65,.659,1.009,1.532,1.009,2.458v8.391Z"/></symbol><symbol id="i-downloads" viewBox="0 0 24 24"><path d="m23 22.5c0 .276-.224.5-.5.5h-21c-.276 0-.5-.224-.5-.5s.224-.5.5-.5h21c.276 0 .5.224.5.5zm-19.918-11.227c-.182-.263-.042-.659.265-.75.054-.017 1.281-.407 3.657-.687-.039-3.475.564-7.873.564-7.845.024-.169.133-.314.288-.385.055-.025 1.368-.607 4.145-.607s4.09.583 4.145.607c.155.071.264.216.288.385.005.033.598 4.326.564 7.845 2.376.28 3.603.67 3.656.687.307.091.448.486.265.75-2.323 3.554-5.233 6.463-8.648 8.648-.164.105-.375.105-.539 0-3.416-2.186-6.325-5.095-8.649-8.648zm1.225.032c2.115 3.08 4.7 5.633 7.694 7.599 2.994-1.966 5.578-4.519 7.693-7.599-.636-.149-1.732-.365-3.266-.526-.259-.027-.453-.247-.448-.506l.011-.286c.005-.11.01-.22.01-.331 0-2.983-.391-6.243-.518-7.227-.469-.148-1.608-.43-3.482-.43s-3.012.281-3.482.43c-.127.984-.518 4.244-.518 7.227 0 .111.005.221.01.331l.01.286c.005.259-.19.479-.448.506-1.534.161-2.63.377-3.267.526z"/></symbol><symbol id="i-folder" viewBox="0 0 24 24"><path d="M22.176,5.188c-.048-.19-.202-.335-.395-.371-.028-.005-2.872-.526-5.795-.693-2.553-.146-4.628-.131-5.433-.115l-.51-1.35c-.055-.145-.174-.256-.322-.302-.062-.019-1.563-.465-3.964-.229-2.314,.227-3.3,.807-3.341,.832-.108,.065-.188,.169-.223,.292-.049,.171-1.193,4.243-1.193,8.632,0,4.592,1.146,8.476,1.195,8.639,.05,.167,.185,.297,.354,.341,.171,.044,4.24,1.078,9.451,1.078,5.242,0,9.408-1.033,9.583-1.077,.166-.042,.299-.165,.353-.327,.043-.131,1.064-3.255,1.064-7.884,0-4.111-.791-7.329-.824-7.464ZM3.098,3.737c.341-.148,1.212-.462,2.757-.614,1.673-.163,2.868,.033,3.346,.135l.542,1.435c.076,.2,.269,.334,.484,.323,.023,0,2.472-.079,5.702,.106,2.289,.131,4.531,.484,5.347,.623,.127,.584,.393,1.941,.565,3.712-1.416-.314-5.189-1.042-9.767-1.042-4.614,0-8.56,.753-9.963,1.057,.241-2.731,.805-5.042,.987-5.735ZM21.065,19.958c-1.011,.227-4.7,.983-9.065,.983-4.32,0-7.92-.75-8.923-.98-.258-.961-1.077-4.316-1.077-8.077,0-.461,.013-.919,.037-1.371,.995-.227,5.126-1.097,10.037-1.097,4.816,0,8.818,.848,9.853,1.088,.045,.678,.073,1.4,.073,2.149,0,3.71-.696,6.469-.935,7.305Z"/></symbol><symbol id="i-play" viewBox="0 0 24 24"><path d="M20.451,10.358c-1.272-1.49-3.532-3.733-7.069-5.959-2.905-1.83-5.488-2.8-7.143-3.292-.784-.231-1.61-.085-2.267,.404-.655,.489-1.031,1.237-1.031,2.052V20.437c0,.815,.376,1.562,1.031,2.052,.452,.337,.984,.512,1.528,.512,.246,0,.494-.036,.738-.108,1.654-.492,4.237-1.461,7.143-3.291,3.537-2.227,5.797-4.47,7.07-5.96,.811-.951,.811-2.332,0-3.284Zm-.76,2.635c-1.229,1.437-3.412,3.603-6.843,5.763-2.809,1.769-5.3,2.705-6.895,3.178-.477,.143-.982,.053-1.383-.247-.4-.299-.63-.754-.63-1.25V3.563c0-.496,.229-.952,.63-1.25,.275-.206,.601-.312,.933-.312,.15,0,.302,.021,.45,.066,1.595,.473,4.086,1.409,6.895,3.179,3.431,2.159,5.614,4.326,6.842,5.762,.491,.576,.491,1.411,0,1.986Z"/></symbol><symbol id="i-remove" viewBox="0 0 24 24"><path d="m22.682,5.711l-4.394-4.394c-.85-.85-1.979-1.318-3.182-1.318h-6.213c-1.202,0-2.333.468-3.182,1.318L1.318,5.711c-.85.85-1.318,1.98-1.318,3.182v6.213c0,1.202.468,2.333,1.318,3.182l4.394,4.394c.85.85,1.98,1.318,3.182,1.318h6.213c1.202,0,2.332-.468,3.182-1.318l4.394-4.394c.851-.85,1.318-1.98,1.318-3.182v-6.213c0-1.202-.468-2.332-1.318-3.182Zm.318,9.395c0,.935-.364,1.814-1.025,2.475l-4.394,4.394c-.661.661-1.54,1.025-2.475,1.025h-6.213c-.935,0-1.814-.364-2.475-1.025l-4.394-4.394c-.661-.661-1.025-1.54-1.025-2.475v-6.213c0-.935.364-1.814,1.025-2.475L6.418,2.025c.661-.661,1.54-1.025,2.475-1.025h6.213c.935,0,1.813.364,2.475,1.025l4.394,4.394c.661.661,1.025,1.541,1.025,2.475v6.213Zm-6.164-7.235l-4.146,4.146,4.146,4.146c.195.195.195.512,0,.707-.098.098-.226.146-.354.146s-.256-.049-.354-.146l-4.146-4.146-4.146,4.146c-.098.098-.226.146-.354.146s-.256-.049-.354-.146c-.195-.195-.195-.512,0-.707l4.146-4.146-4.146-4.146c-.195-.195-.195-.512,0-.707s.512-.195.707,0l4.146,4.146,4.146-4.146c.195-.195.512-.195.707,0s.195.512,0,.707Z"/></symbol><symbol id="i-note" viewBox="0 0 24 24"><g><path d="M16.648,13.405H7.352c-.276,0-.5-.224-.5-.5s.224-.5,.5-.5h9.297c.276,0,.5,.224,.5,.5s-.224,.5-.5,.5Z"/><path d="M12.437,17.113H7.352c-.276,0-.5-.224-.5-.5s.224-.5,.5-.5h5.085c.276,0,.5,.224,.5,.5s-.224,.5-.5,.5Z"/></g><path d="M21.581,6.844c-.02-.113-.078-.216-.165-.291L15.472,1.378c-.065-.057-.145-.096-.229-.113-.887-.178-1.906-.265-3.116-.265C7.566,1,3.576,1.827,3.537,1.835c-.184,.039-.331,.177-.38,.358-.046,.169-1.121,4.201-1.121,9.603,0,5.447,1.076,9.437,1.121,9.604,.045,.164,.17,.294,.333,.345,.163,.051,4.042,1.254,8.637,1.254s8.473-1.203,8.636-1.254c.173-.054,.303-.198,.34-.375,.009-.041,.862-4.188,.862-9.574,0-1.856-.125-3.476-.383-4.953Zm-.956,.346s0,.004,0,.006c-2.359,.217-4.694-.034-5.553-.148-.105-.655-.296-2.291-.177-4.83,.006,.001,.013,.002,.02,.003l5.709,4.969Zm-.446,13.684c-.973,.272-4.317,1.126-8.054,1.126-3.769,0-7.125-.864-8.072-1.131-.237-.98-1.019-4.551-1.019-9.072,0-4.442,.767-8.013,1.012-9.042,1.003-.188,4.345-.754,8.079-.754,.653,0,1.238,.03,1.778,.083-.176,3.581,.239,5.443,.257,5.523,.046,.197,.206,.346,.405,.379,.1,.017,1.874,.304,4.092,.304,.672,0,1.388-.036,2.108-.104,.132,1.102,.198,2.294,.198,3.612,0,4.467-.597,8.056-.785,9.077Z"/></symbol><symbol id="i-newaudio" viewBox="0 0 24 24"><path d="m21.5,3H2.5c-1.379,0-2.5,1.122-2.5,2.5v15.5h24V5.5c0-1.378-1.121-2.5-2.5-2.5Zm1.5,17H1V5.5c0-.827.673-1.5,1.5-1.5h19c.827,0,1.5.673,1.5,1.5v14.5Zm-3.003-12h1.003l-.508,7c-.043.705-.472,1-.988,1-.342,0-.66-.242-.841-.64l-1.164-2.56-1.164,2.56c-.181.398-.499.64-.841.64-.516,0-.945-.295-.988-1l-.508-7h1.003l.493,6.794,2.005-4.41,2.005,4.41.493-6.794Zm-10.497,0h3.5v1h-2.5v2.5h2.5v1h-2.5v2.5h2.5v1h-3.5v-8Zm-2.5,0h1v8h-.79l-3.21-5.617v5.617h-1v-8h.79l3.21,5.617v-5.617Z"/></symbol><symbol id="i-menu" viewBox="0 0 24 24"><path d="m12,0C5.383,0,0,5.383,0,12s5.383,12,12,12,12-5.383,12-12S18.617,0,12,0Zm0,22c-5.514,0-10-4.486-10-10S6.486,2,12,2s10,4.486,10,10-4.486,10-10,10Zm1.5-15.5c0,.828-.672,1.5-1.5,1.5s-1.5-.672-1.5-1.5.672-1.5,1.5-1.5,1.5.672,1.5,1.5Zm0,11c0,.828-.672,1.5-1.5,1.5s-1.5-.672-1.5-1.5.672-1.5,1.5-1.5,1.5.672,1.5,1.5Zm0-5.5c0,.828-.672,1.5-1.5,1.5s-1.5-.672-1.5-1.5.672-1.5,1.5-1.5,1.5.672,1.5,1.5Z"/></symbol><symbol id="i-web" viewBox="0 0 24 24"><path d="m12.023.001s-.008,0-.012,0c-.004,0-.007,0-.01,0-.005,0-.009,0-.014,0-.002,0-.003,0-.005,0C5.373.011,0,5.389,0,12c0,.175.004.348.011.521.012.275.231.464.521.479.276-.012.49-.245.479-.521-.007-.159-.011-.318-.011-.479,0-1.412.277-2.758.764-4h4.907c-.147.454-.281.916-.385,1.395-.059.27.133.605.488.605.23,0,.438-.16.488-.395.119-.552.279-1.086.462-1.605h8.546c.438,1.246.73,2.593.73,4s-.292,2.753-.731,4h-1.769c-.276,0-.5.224-.5.5s.224.5.5.5h1.377c-1.361,3.142-3.528,5.444-4.079,5.995-.093-.002-.186-.002-.278-.006-.281-.004-.509.204-.521.479-.011.275.203.509.479.521.173.007.346.011.521.011,6.617,0,12-5.383,12-12S18.629.014,12.023.001Zm-4.991,6.999H2.214C3.86,3.793,7.027,1.495,10.762,1.074c-1.017,1.143-2.661,3.253-3.73,5.926Zm1.08,0c1.226-2.834,3.122-4.987,3.888-5.789.762.797,2.651,2.948,3.88,5.789h-7.767Zm8.859,0c-1.067-2.669-2.712-4.781-3.732-5.925,3.734.421,6.901,2.719,8.546,5.925h-4.814Zm-3.732,15.925c1.019-1.144,2.664-3.256,3.732-5.925h4.814c-1.645,3.206-4.812,5.504-8.546,5.925Zm4.091-6.925c.403-1.248.669-2.589.669-4s-.265-2.752-.669-4h4.905c.487,1.242.764,2.588.764,4s-.277,2.758-.764,4h-4.905Zm-5.054-4.267c-.678-.678-1.667-.904-2.582-.597-.014.005-8.805,3.997-8.805,3.997-.523.237-.868.763-.879,1.338-.01.574.315,1.111.829,1.369l1.938.969-2.304,2.292c-.661.661-.661,1.737,0,2.4.662.662,1.74.661,2.4,0l2.312-2.302.983,1.97c.257.511.771.828,1.369.828.575-.011,1.101-.355,1.338-.879l3.961-8.717c.342-.98.133-1.979-.561-2.67Zm-.366,2.298l-3.944,8.675c-.079.175-.254.29-.455.293-.19,0-.362-.106-.447-.276l-1.293-2.588c-.071-.144-.221-.287-.447-.276-.131,0-.259.052-.353.146l-2.803,2.791c-.271.271-.716.271-.987,0-.271-.272-.271-.715,0-.985l2.796-2.782c.114-.113.167-.275.141-.434-.025-.159-.126-.296-.27-.368l-2.56-1.279c-.171-.086-.28-.266-.276-.457.003-.191.118-.366.293-.445l8.718-3.962c.549-.185,1.142-.05,1.548.358.421.421.539,1.016.341,1.591Z"/></symbol><symbol id="i-update" viewBox="0 0 512 512"><path d="M0 0 C6.1 5.3 7.9 12.3 9.8 19.9 C10 20.9 10.3 21.9 10.5 22.9 C14.7 39.7 17.8 57 18 74.3 C18 75.3 18 76.2 18 77.2 C18.2 97.9 18 118 13.8 138.4 C13.4 139.9 13.4 139.9 13.1 141.4 C5.2 178.5 -10.8 213.6 -34.2 243.4 C-35 244.4 -35.8 245.4 -36.6 246.4 C-49.6 262.5 -63.9 277.8 -80.5 290.1 C-82.3 291.4 -84 292.8 -85.8 294.1 C-95.4 301.5 -105.6 307.6 -116.2 313.4 C-116.9 313.7 -117.6 314.1 -118.2 314.5 C-155.3 334.5 -196 343.9 -237.9 343.7 C-239.3 343.7 -239.3 343.7 -240.8 343.7 C-255.2 343.6 -269.1 343.1 -283.2 340.4 C-284.2 340.2 -285.1 340 -286 339.9 C-303.5 336.6 -322.7 332.4 -338.2 323.4 C-340 320.6 -340.3 319.6 -340.1 316.3 C-338.9 312 -338.9 312 -336.2 310.4 C-329.9 308.8 -326 310.1 -320.2 312.4 C-262.3 333.8 -197.4 332.1 -141 306.7 C-114.5 294.4 -91.3 278.6 -70.2 258.4 C-69.7 257.9 -69.2 257.4 -68.7 256.9 C-60.7 249.3 -53.8 241.2 -47.2 232.4 C-46.6 231.5 -46.6 231.5 -46 230.7 C-23.7 201 -9.2 166.8 -2.2 130.4 C-2 129.2 -2 129.2 -1.8 128 C5.2 93.2 1.7 55.2 -7.7 21.4 C-8.3 19 -8.8 16.7 -9.2 14.4 C-9.8 14.6 -10.3 14.8 -10.8 14.9 C-16.2 16.9 -21.6 18.8 -27 20.8 C-29.1 21.5 -31.1 22.2 -33.1 23 C-36 24 -38.9 25.1 -41.8 26.1 C-42.7 26.4 -43.6 26.8 -44.5 27.1 C-45.4 27.4 -46.2 27.7 -47 28 C-47.8 28.3 -48.5 28.5 -49.3 28.8 C-51.2 29.4 -51.2 29.4 -54.2 29.4 C-54.1 30.1 -53.9 30.7 -53.7 31.4 C-52.9 34.6 -52.2 37.8 -51.4 40.9 C-51 42.5 -51 42.5 -50.6 44.2 C-47.1 58.5 -45.9 72.4 -45.9 87.1 C-45.9 87.8 -45.9 88.6 -45.9 89.5 C-46 101.7 -46.5 113.4 -49.2 125.4 C-49.5 126.7 -49.5 126.7 -49.9 128.1 C-61.1 177.9 -91 222.1 -134.2 249.6 C-143.9 255.6 -153.7 261 -164.2 265.4 C-165.4 265.9 -166.6 266.4 -167.8 266.9 C-176 270.2 -184.3 272.6 -192.8 274.6 C-193.8 274.9 -194.8 275.1 -195.8 275.4 C-209.8 278.6 -223.4 279.8 -237.6 279.8 C-238.4 279.8 -239.2 279.8 -240 279.8 C-265.3 279.7 -289.4 274.9 -312.9 265.2 C-313.7 264.9 -314.5 264.6 -315.3 264.3 C-322.2 261.3 -322.2 261.3 -324.2 257.4 C-324.9 254.7 -324.9 254.7 -324.2 251.4 C-322.2 248.2 -319.7 245.3 -317.2 242.4 C-316.2 241.1 -315.2 239.7 -314.2 238.4 C-314.9 238.3 -315.5 238.2 -316.1 238 C-329.8 235.5 -343.5 232.7 -357.2 229.8 C-357.9 229.7 -358.6 229.5 -359.3 229.4 C-363.7 228.4 -368.1 227.5 -372.5 226.5 C-378.5 225.3 -384.5 224 -390.4 222.7 C-392.5 222.3 -394.6 221.8 -396.6 221.4 C-397.9 221.1 -399.1 220.8 -400.4 220.6 C-401.5 220.3 -402.6 220.1 -403.7 219.9 C-406.1 219.3 -406.1 219.3 -408.2 219.4 C-400.1 241.4 -391.8 263.3 -383.4 285.2 C-383 286.3 -382.6 287.3 -382.2 288.4 C-381 291.4 -379.9 294.3 -378.8 297.3 C-378.4 298.2 -378.1 299.1 -377.7 300 C-377.4 300.8 -377.1 301.6 -376.8 302.5 C-376.5 303.2 -376.2 303.9 -375.9 304.6 C-375.2 306.4 -375.2 306.4 -374.2 308.4 C-373.6 307.6 -372.9 306.8 -372.1 306 C-371.2 305 -370.3 304 -369.4 302.9 C-368.9 302.4 -368.4 301.9 -368 301.4 C-363.6 296.6 -363.6 296.6 -359.4 296 C-356.2 296.4 -356.2 296.4 -353.4 298.5 C-351.2 301.4 -351.2 301.4 -350.5 304.1 C-351.7 309.3 -354.8 312.4 -358.2 316.4 C-359.3 317.7 -360.4 318.9 -361.5 320.2 C-362.7 321.6 -363.8 322.9 -365 324.3 C-365.9 325.3 -365.9 325.3 -366.7 326.3 C-367.5 327.3 -367.5 327.3 -368.4 328.2 C-369.1 329.1 -369.1 329.1 -369.8 329.9 C-372.1 332.3 -373.9 333.3 -377.1 333.8 C-380.5 333.4 -381.7 332.6 -384 330.2 C-386.8 326.3 -388.2 321.6 -389.8 317.1 C-390.4 315.4 -390.4 315.4 -391.1 313.7 C-392 311.2 -392.9 308.8 -393.8 306.4 C-395.3 302.5 -396.7 298.6 -398.1 294.7 C-399.7 290.7 -401.2 286.7 -402.7 282.7 C-407.6 269.5 -412.6 256.3 -417.6 243.2 C-419 239.6 -420.4 236 -421.7 232.4 C-422.6 230.2 -423.4 228.1 -424.2 225.9 C-424.6 224.9 -425 223.9 -425.4 222.8 C-425.7 221.9 -426.1 221 -426.4 220.1 C-426.8 219.3 -427.1 218.5 -427.4 217.7 C-428 216 -428.7 214.4 -429.3 212.8 C-430.5 209.7 -430.7 207.7 -430.2 204.4 C-428.2 201.5 -428.2 201.5 -425.2 199.4 C-419 198.8 -413.2 200.2 -407.2 201.5 C-405.5 201.9 -405.5 201.9 -403.9 202.2 C-400.2 203 -396.6 203.8 -393 204.5 C-390.5 205.1 -388 205.6 -385.5 206.1 C-380.2 207.2 -374.9 208.3 -369.6 209.5 C-363.5 210.8 -357.5 212 -351.4 213.3 C-345.5 214.6 -339.6 215.8 -333.8 217 C-331.3 217.6 -328.8 218.1 -326.3 218.6 C-322.8 219.3 -319.3 220.1 -315.9 220.8 C-314.3 221.2 -314.3 221.2 -312.8 221.5 C-294.2 225.4 -294.2 225.4 -291 228.6 C-290 232.3 -290.4 234.7 -291.2 238.4 C-293.5 241.4 -293.5 241.4 -296.3 244.2 C-299.9 247.3 -299.9 247.3 -301.2 251.4 C-256.8 267.5 -209 266.8 -165.5 247.3 C-161.7 245.5 -157.9 243.5 -154.2 241.4 C-153.6 241 -153 240.7 -152.3 240.3 C-139.1 232.9 -127.3 223.8 -116.2 213.4 C-115.4 212.6 -114.6 211.9 -113.8 211.1 C-91.1 189.2 -74.8 159.3 -67.4 128.7 C-67.2 127.5 -67.2 127.5 -66.8 126.2 C-63.9 113.3 -62.9 100.4 -62.9 87.1 C-62.9 86 -62.9 86 -62.9 85 C-63 70.6 -64.5 57.2 -68.4 43.4 C-70.6 35.8 -72.1 28.3 -68.6 20.9 C-63.3 15.2 -57.2 13 -50 10.5 C-49 10.2 -48 9.8 -47 9.5 C-43.9 8.4 -40.8 7.3 -37.6 6.2 C-35.5 5.4 -33.4 4.7 -31.3 4 C-29.3 3.2 -27.3 2.5 -25.3 1.8 C-24.3 1.5 -23.4 1.2 -22.4 0.8 C-21.5 0.5 -20.6 0.2 -19.7 -0.1 C-18.6 -0.5 -18.6 -0.5 -17.4 -0.9 C-11.1 -3 -6 -3 0 0 Z " transform="translate(494.2,168.6)"/><path d="M0 0 C1 0 2 0 3 0 C19.4 0 35.1 1 51.2 4.4 C52.7 4.7 52.7 4.7 54.3 5 C65.6 7.5 76.6 10.7 87.4 14.5 C88.8 15 88.8 15 90.2 15.5 C98.3 18.5 98.3 18.5 101.2 22.4 C102.1 25.5 102.5 27.5 101.5 30.6 C99.8 32.9 98.9 33.6 96.2 34.4 C90.6 33.9 85.8 32.7 80.6 30.7 C22.2 9.4 -43.4 12.2 -99.8 38.4 C-125.2 50.5 -147.5 65.9 -167.8 85.4 C-168.3 85.9 -168.8 86.3 -169.4 86.8 C-177.3 94.4 -184.2 102.5 -190.8 111.4 C-191.2 111.9 -191.7 112.5 -192.1 113.1 C-214.1 142.4 -228.7 176.4 -235.8 212.4 C-236 213.2 -236.1 213.9 -236.3 214.7 C-243.4 249.7 -239.8 288.3 -230.3 322.4 C-229.7 324.7 -229.3 327 -228.8 329.4 C-228.3 329.2 -227.8 329 -227.2 328.8 C-221.8 326.9 -216.4 324.9 -211 323 C-209 322.2 -207 321.5 -205 320.8 C-202.1 319.7 -199.2 318.7 -196.3 317.7 C-195.4 317.3 -194.5 317 -193.6 316.7 C-192.3 316.2 -192.3 316.2 -191 315.8 C-190.3 315.5 -189.5 315.2 -188.8 314.9 C-186.8 314.4 -186.8 314.4 -183.8 314.4 C-184 313.7 -184.2 313 -184.3 312.3 C-185.1 309.1 -185.9 306 -186.7 302.8 C-187 301.8 -187.2 300.7 -187.5 299.6 C-191 285.3 -192.2 271.4 -192.1 256.8 C-192.1 256 -192.1 255.2 -192.1 254.4 C-191.9 201 -169.6 153.8 -132.1 116.3 C-121.3 105.8 -109 96.8 -95.8 89.4 C-95.2 89 -94.6 88.7 -93.9 88.3 C-65.3 72 -33.3 63.9 -0.4 64 C0.3 64 1.1 64 1.9 64 C27.3 64.1 51.4 68.9 74.8 78.5 C76 79 76 79 77.2 79.5 C84.1 82.4 84.1 82.4 86.2 86.4 C86.8 89.1 86.8 89.1 86.2 92.4 C84.1 95.6 81.7 98.5 79.2 101.4 C78.2 102.7 77.2 104 76.2 105.4 C76.8 105.5 77.4 105.6 78 105.7 C91.8 108.3 105.4 111 119.1 113.9 C119.8 114.1 120.5 114.2 121.3 114.4 C125.7 115.3 130.1 116.3 134.4 117.2 C140.4 118.5 146.4 119.8 152.4 121 C154.4 121.5 156.5 121.9 158.6 122.4 C159.8 122.6 161 122.9 162.3 123.2 C163.4 123.4 164.5 123.6 165.6 123.9 C168.1 124.4 168.1 124.4 170.2 124.4 C162 102.4 153.7 80.4 145.3 58.5 C144.9 57.5 144.5 56.4 144.1 55.3 C143 52.4 141.8 49.4 140.7 46.5 C140.3 45.5 140 44.7 139.7 43.8 C139.2 42.5 139.2 42.5 138.7 41.3 C138.4 40.6 138.2 39.9 137.9 39.1 C137.2 37.3 137.2 37.3 136.2 35.4 C135.5 36.2 134.8 36.9 134.1 37.8 C133.2 38.8 132.2 39.8 131.3 40.8 C130.8 41.3 130.4 41.9 129.9 42.4 C125.6 47.2 125.6 47.2 121.4 47.8 C118.2 47.4 118.2 47.4 115.3 45.2 C113.2 42.4 113.2 42.4 112.4 39.6 C113.6 34.5 116.8 31.3 120.2 27.4 C121.3 26.1 122.4 24.8 123.4 23.5 C124.6 22.2 125.8 20.8 126.9 19.4 C127.5 18.8 128.1 18.1 128.7 17.4 C129.2 16.8 129.7 16.2 130.3 15.5 C130.8 15 131.3 14.4 131.8 13.8 C134.1 11.5 135.8 10.4 139.1 9.9 C142.4 10.4 143.6 11.2 145.9 13.6 C148.8 17.6 150.2 22.3 151.9 26.9 C152.3 28.1 152.7 29.2 153.2 30.4 C154.1 32.9 155 35.4 155.9 37.9 C157.4 41.8 158.8 45.7 160.3 49.6 C161.8 53.6 163.3 57.6 164.8 61.6 C169.2 73.3 173.6 85 178.1 96.7 C179.2 99.6 180.3 102.5 181.5 105.5 C181.8 106.4 182.2 107.3 182.5 108.2 C183.2 109.9 183.8 111.7 184.5 113.4 C185.9 117.1 187.3 120.7 188.8 124.3 C189.2 125.5 189.7 126.6 190.2 127.8 C190.6 128.7 191 129.7 191.4 130.7 C192.3 133.8 192.5 136.2 192.2 139.4 C190.1 142.2 190.1 142.2 187.2 144.4 C180.7 145 174.5 143.4 168.2 142 C167 141.8 165.8 141.5 164.6 141.3 C161.3 140.6 158 139.9 154.8 139.2 C152.1 138.7 149.3 138.1 146.6 137.5 C140.2 136.2 133.8 134.8 127.3 133.4 C120.7 132 114.1 130.6 107.5 129.2 C101.8 128.1 96.1 126.9 90.4 125.7 C87 124.9 83.6 124.2 80.2 123.5 C76.4 122.7 72.6 121.9 68.8 121.1 C67.1 120.8 67.1 120.8 65.4 120.4 C64.4 120.2 63.4 120 62.3 119.7 C61.4 119.5 60.5 119.3 59.6 119.2 C56.9 118.3 55.2 117.3 53.2 115.4 C52.1 111.7 51.6 109.5 53.4 105.9 C55.8 102.4 58.6 99.5 61.5 96.4 C63.4 94.5 63.4 94.5 63.2 92.4 C16.6 75.5 -31.7 77.8 -76.7 98.3 C-87.5 103.5 -97.3 110.2 -106.8 117.4 C-107.7 118.1 -108.7 118.8 -109.6 119.5 C-145.8 147.9 -168.2 190.3 -174.4 235.6 C-175.1 242.4 -175.2 249.2 -175.1 256.1 C-175.1 256.8 -175.1 257.6 -175.1 258.3 C-175.1 272.9 -173.6 286.3 -169.6 300.3 C-167.5 308 -166 315.4 -169.4 322.9 C-174.8 328.5 -180.8 330.7 -188 333.2 C-189.4 333.8 -189.4 333.8 -190.9 334.3 C-192.9 335 -195 335.7 -197.1 336.5 C-200.2 337.6 -203.3 338.7 -206.4 339.8 C-208.4 340.5 -210.4 341.2 -212.4 341.9 C-213.3 342.2 -214.2 342.6 -215.2 342.9 C-228.9 347.7 -228.9 347.7 -235.1 345.2 C-235.7 345 -236.3 344.8 -236.9 344.6 C-242.1 341.3 -244 336.2 -245.8 330.6 C-246 329.9 -246.2 329.1 -246.5 328.3 C-253.8 305.1 -256.2 281.3 -256.2 257.1 C-256.2 256.1 -256.2 255.1 -256.2 254.1 C-256.1 237.5 -255.2 221.6 -251.8 205.4 C-251.6 204.3 -251.4 203.3 -251.2 202.2 C-240.9 155.1 -218 113.2 -184.8 78.4 C-184.2 77.8 -183.7 77.2 -183.1 76.6 C-175.1 68.2 -166.9 60.6 -157.6 53.7 C-155.8 52.4 -154 51 -152.3 49.6 C-142.6 42.3 -132.4 36.2 -121.8 30.4 C-121.2 30 -120.5 29.6 -119.8 29.3 C-82.7 9.2 -42 -0.1 0 0 Z " transform="translate(255.8,-0.4)"/><path d="M0 0 C1 -0 2 -0.1 3 -0.1 C10.8 -0.1 18.1 0.9 24.1 6.1 C32.1 14.3 33.6 23.3 33.5 34.3 C33.1 43.8 30.5 50.6 23.9 57.6 C16.8 63.8 9.1 64.5 0.1 64.6 C-1.3 64.7 -1.3 64.7 -2.6 64.7 C-4 64.7 -4 64.7 -5.3 64.7 C-6.1 64.8 -6.8 64.8 -7.7 64.8 C-11.3 64.1 -12.6 63.2 -15 60.3 C-15.8 56.4 -15.8 52.5 -15.8 48.5 C-15.8 47.4 -15.9 46.2 -15.9 45 C-15.9 42.6 -15.9 40.1 -16 37.7 C-16 34 -16.1 30.2 -16.1 26.5 C-16.2 24.1 -16.2 21.7 -16.2 19.4 C-16.3 18.2 -16.3 17.1 -16.3 16 C-16.3 10.4 -16.3 6.1 -13 1.3 C-9.1 -0.6 -4.3 0 0 0 Z M0 16.3 C0.3 26.9 0.7 37.4 1 48.3 C7.9 48.5 7.9 48.5 13 45.3 C17.5 40.1 17.3 35.1 17.2 28.5 C17 24.7 16.2 22.4 14 19.3 C9.5 15.3 9.5 15.3 0 16.3 Z " transform="translate(231,224.7)"/><path d="M0 0 C3.5 0.8 4.4 1.1 6.5 3.8 C6.8 6.8 7 9.5 7 12.5 C7 13.3 7 14.2 7 15.1 C7.1 17.8 7.1 20.5 7.1 23.2 C7.2 26 7.2 28.7 7.2 31.4 C7.3 33.1 7.3 34.8 7.3 36.5 C7.4 40.1 7.5 43.4 8.5 46.8 C14.5 48.9 14.5 48.9 20.4 47.6 C23.6 46.1 23.6 46.1 24.5 43.8 C24.6 41 24.6 38.1 24.6 35.3 C24.7 33.5 24.7 31.8 24.7 30 C24.7 27.3 24.8 24.5 24.8 21.7 C24.8 19.1 24.8 16.4 24.8 13.8 C24.8 12.9 24.8 12.1 24.8 11.3 C24.9 6.9 25.1 5.3 27.9 1.8 C30.5 -0.2 30.5 -0.2 32.6 -0.6 C33.3 -0.5 34 -0.4 34.6 -0.3 C35.3 -0.2 36 -0.1 36.6 -0.1 C39.5 1.3 40.1 2.9 41.5 5.8 C41.9 8.8 41.9 11.8 41.9 14.8 C41.9 15.6 41.9 16.5 41.9 17.4 C41.9 19.2 41.9 21 41.9 22.8 C41.9 25.6 41.9 28.4 41.9 31.1 C41.9 32.9 41.9 34.7 41.9 36.5 C41.9 37.7 41.9 37.7 41.9 38.9 C41.8 46.2 40.2 52.9 35.1 58.4 C28.5 64 20.8 66.3 12.2 65.6 C4.8 64.4 -1.1 60.6 -5.9 54.9 C-9.2 48.5 -9.8 42.2 -9.8 35.1 C-9.8 34.3 -9.8 33.5 -9.8 32.7 C-9.8 31 -9.8 29.4 -9.8 27.7 C-9.8 25.1 -9.8 22.6 -9.9 20 C-9.9 18.4 -9.9 16.8 -9.9 15.1 C-9.9 14.3 -9.9 13.6 -9.9 12.8 C-9.8 8.3 -9.3 5.4 -6.5 1.8 C-3.5 -0.2 -3.5 -0.2 0 0 Z " transform="translate(112.5,224.2)"/><path d="M0 0 C2.8 2.2 3.8 4.6 5.1 7.8 C5.7 9.3 5.7 9.3 6.2 10.8 C6.8 12.4 6.8 12.4 7.5 14 C7.9 15.1 8.3 16.2 8.7 17.3 C9.6 19.6 10.5 21.9 11.3 24.2 C12.7 27.7 14 31.2 15.4 34.8 C16.2 37 17.1 39.2 17.9 41.5 C18.4 42.5 18.8 43.6 19.2 44.7 C21.2 50 22.7 54.3 22 60 C20.1 62.7 18.7 63.8 15.6 64.9 C12.2 65 10.8 64.9 8 63 C6 59.6 4 56 4 52 C-2.3 52 -8.5 52 -15 52 C-16 55 -17 57.9 -18 61 C-21.3 64.3 -22.4 64.8 -27 65 C-31.6 62.9 -31.6 62.9 -33 60 C-33.5 54 -32.1 49.7 -29.9 44.2 C-29.4 43 -29.4 43 -28.9 41.7 C-27.9 39.1 -26.9 36.4 -25.8 33.8 C-25.1 32.1 -24.4 30.3 -23.8 28.6 C-22.2 24.4 -20.5 20.3 -18.9 16.2 C-18.1 14.2 -17.3 12.2 -16.6 10.2 C-16.2 9.1 -15.8 8.1 -15.3 7 C-15 6 -14.7 5.2 -14.3 4.2 C-10.8 -1.8 -6 -1.4 0 0 Z M-6 28 C-7 31 -8 33.9 -9 37 C-6.7 37 -4.4 37 -2 37 C-3 34 -4 31.1 -5 28 C-5.3 28 -5.7 28 -6 28 Z " transform="translate(300,225)"/><path d="M0 0 C1.3 0 1.3 0 2.7 0 C3.6 0 4.6 0.1 5.5 0.1 C6.4 0.1 7.3 0.1 8.3 0.1 C15.3 0.2 20.7 1.6 26.9 5.2 C31.5 10 34.5 15.8 34.8 22.6 C34.5 29.4 31.5 35.2 26.8 40 C19.6 44.3 14.6 45 6.2 44.6 C6.2 45.8 6.3 47 6.3 48.2 C6.4 49.7 6.4 51.3 6.5 52.8 C6.5 54 6.5 54 6.5 55.2 C6.7 61 6.7 61 4.3 64.1 C1.8 65.9 0.3 66.5 -2.8 66.6 C-8.4 64.3 -8.4 64.3 -9.8 61.6 C-9.9 59.8 -10 58.1 -10 56.3 C-10 55.2 -10 54.1 -10 53 C-10.1 47.9 -10.1 42.9 -10.2 37.8 C-10.2 35.1 -10.2 32.5 -10.2 29.8 C-10.3 25.9 -10.3 22.1 -10.3 18.3 C-10.3 17.1 -10.4 15.9 -10.4 14.7 C-10.4 6.4 -10.4 6.4 -7.6 2.3 C-4.7 0.5 -3.3 -0 0 0 Z M6.2 16.6 C6.2 20.6 6.2 24.5 6.2 28.6 C11.8 29.1 11.8 29.1 16.8 26.9 C18.4 24.7 18.4 24.7 18.1 22 C16.9 18.7 16.9 18.7 14.2 16.6 C11.5 16.4 8.9 16.5 6.2 16.6 Z " transform="translate(173.8,223.4)"/><path d="M0 0 C1.1 -0 2.2 -0 3.3 -0.1 C4.3 -0.1 5.4 -0.1 6.5 -0.1 C7.9 -0.1 7.9 -0.1 9.4 -0.1 C12.9 0.3 15.6 1.7 18.1 4.2 C18.7 11.4 18.7 11.4 16.6 14.5 C13.1 16.9 10 16.7 5.9 16.5 C4.8 16.5 4.8 16.5 3.6 16.4 C1.8 16.4 -0 16.3 -1.9 16.2 C-1.9 19.2 -1.9 22.2 -1.9 25.2 C-0.9 25.2 0 25.1 1 25.1 C11.2 24.7 11.2 24.7 15.6 27.2 C17.4 30.7 17.5 32.6 17 36.4 C15.7 39.2 14 40 11.1 41.2 C7.8 41.5 7.8 41.5 4.3 41.4 C2.6 41.4 2.6 41.4 0.8 41.4 C-0.1 41.3 -1 41.3 -1.9 41.2 C-1.9 43.9 -1.9 46.5 -1.9 49.2 C-0.5 49.2 -0.5 49.2 1 49.1 C2.3 49.1 3.5 49.1 4.8 49.1 C6.7 49 6.7 49 8.6 49 C12.3 49.3 14.2 50 17.1 52.2 C18.7 55.3 18.4 57.8 18.1 61.2 C16 64.2 14.8 65.1 11.2 65.8 C10 65.8 8.9 65.8 7.8 65.8 C6.5 65.8 5.3 65.8 4 65.8 C2.7 65.8 1.4 65.8 0.1 65.8 C-1.8 65.8 -1.8 65.8 -3.8 65.8 C-5 65.8 -6.2 65.8 -7.5 65.8 C-9.2 65.8 -9.2 65.8 -10.9 65.8 C-14.6 65.1 -15.6 64.1 -17.9 61.2 C-18.4 58.7 -18.4 58.7 -18.4 55.7 C-18.4 54.6 -18.4 53.5 -18.4 52.4 C-18.4 51.2 -18.4 50 -18.4 48.8 C-18.4 47.5 -18.4 46.3 -18.4 45 C-18.4 42.4 -18.4 39.8 -18.3 37.2 C-18.3 33.3 -18.3 29.3 -18.3 25.3 C-18.3 22.8 -18.3 20.3 -18.3 17.8 C-18.3 16.6 -18.3 15.4 -18.3 14.1 C-18.3 13 -18.3 11.9 -18.3 10.8 C-18.3 9.8 -18.3 8.8 -18.3 7.8 C-17.8 4.8 -17 3.4 -14.9 1.2 C-10 -0.4 -5.1 0 0 0 Z " transform="translate(390.9,223.8)"/><path d="M0 0 C1.1 -0 1.1 -0 2.2 -0 C3.7 -0 5.2 -0 6.7 0 C9 0 11.2 0 13.5 -0 C15 -0 16.5 -0 17.9 0 C19 -0 19 -0 20 -0 C23.8 0.1 25.4 0.6 28.4 3 C30.5 5.7 30.5 5.7 31 9.2 C30.5 12.7 30.5 12.7 29.1 15.1 C26.1 16.9 24.7 16.8 21.3 16.8 C20.4 16.8 19.5 16.7 18.6 16.7 C17.5 16.7 17.5 16.7 16.5 16.7 C16.5 17.2 16.5 17.8 16.5 18.4 C16.6 24.3 16.6 30.2 16.6 36.1 C16.6 38.4 16.7 40.6 16.7 42.8 C16.7 46 16.8 49.1 16.8 52.3 C16.8 53.3 16.8 54.3 16.8 55.3 C16.8 56.2 16.8 57.1 16.8 58.1 C16.8 58.9 16.8 59.7 16.8 60.6 C16.4 63.2 15.6 64 13.5 65.7 C9.9 66.8 8.2 67 4.7 65.5 C1.9 63.2 0.7 61.2 0.2 57.5 C0.2 56.8 0.2 56 0.2 55.3 C0.2 54.4 0.2 53.5 0.2 52.6 C0.2 51.7 0.3 50.8 0.3 49.9 C0.3 48.9 0.3 48 0.3 47 C0.3 44 0.3 40.9 0.3 37.9 C0.3 35.9 0.4 33.8 0.4 31.8 C0.4 26.7 0.4 21.7 0.5 16.7 C-0.1 16.7 -0.8 16.7 -1.4 16.7 C-2.2 16.7 -3 16.8 -3.9 16.8 C-4.7 16.8 -5.5 16.8 -6.3 16.8 C-8.5 16.7 -8.5 16.7 -11.1 15.1 C-13.1 11.7 -13.2 9.6 -12.5 5.7 C-8.8 0.9 -5.8 -0.1 0 0 Z " transform="translate(333.5,223.3)"/></symbol><symbol id="i-stt" viewBox="0 0 512 512"><path d="M0 0 C1.4 -0 1.4 -0 2.7 -0 C4.6 -0 6.5 -0 8.4 -0 C11.3 -0.1 14.2 -0.1 17.1 -0.1 C19 -0.1 20.8 -0.1 22.7 -0.1 C23.5 -0.1 24.4 -0.1 25.3 -0.2 C35.8 -0.1 45.1 3 52.8 10.2 C60.9 18.6 63.8 27.9 63.8 39.4 C63.8 40.2 63.8 40.9 63.8 41.6 C63.8 44 63.8 46.4 63.8 48.8 C63.8 50.5 63.9 52.3 63.9 54 C63.9 58.7 63.9 63.4 63.9 68.1 C63.9 71 63.9 73.9 63.9 76.8 C63.9 86 63.9 95.2 63.9 104.4 C63.9 115 63.9 125.5 64 136.1 C64 144.3 64 152.5 64 160.7 C64 165.5 64 170.4 64 175.3 C64 179.9 64 184.5 64 189.1 C64 190.8 64 192.5 64 194.1 C64.1 208.6 63.1 221.1 52.9 232.2 C43.5 241.1 33.3 242.2 20.7 242.2 C20.7 276.5 20.7 310.8 20.7 346.2 C31.6 346.2 42.5 346.2 53.7 346.2 C57.7 349.2 57.7 349.2 58.6 352.6 C58.7 356.6 58.1 358.1 55.7 361.2 C52.4 362.8 48.9 362.4 45.3 362.4 C44.5 362.4 43.6 362.4 42.7 362.4 C39.9 362.4 37 362.4 34.1 362.4 C33.2 362.4 32.2 362.4 31.2 362.4 C26 362.5 20.9 362.5 15.7 362.5 C10.4 362.5 5 362.5 -0.3 362.6 C-4.4 362.6 -8.5 362.6 -12.6 362.6 C-14.6 362.6 -16.5 362.6 -18.5 362.7 C-21.2 362.7 -24 362.7 -26.7 362.7 C-27.9 362.7 -27.9 362.7 -29.2 362.7 C-32.8 362.7 -34.9 362.5 -37.8 360.3 C-39.5 358 -39.9 357 -39.8 354.2 C-39.8 353.2 -39.8 353.2 -39.9 352.2 C-39.3 350.2 -39.3 350.2 -35.3 346.2 C-22.8 346.2 -10.2 346.2 2.7 346.2 C2.7 311.9 2.7 277.6 2.7 242.2 C-0.9 242.2 -4.6 242.2 -8.3 242.2 C-19.1 240.2 -27.1 235.6 -34 227.1 C-39 219.8 -40.5 212.6 -40.5 203.9 C-40.5 203.1 -40.5 202.4 -40.5 201.7 C-40.5 199.2 -40.5 196.8 -40.5 194.3 C-40.5 192.6 -40.5 190.8 -40.5 189.1 C-40.5 184.3 -40.5 179.6 -40.5 174.8 C-40.5 171.9 -40.5 168.9 -40.5 165.9 C-40.5 155.6 -40.5 145.2 -40.5 134.8 C-40.5 125.2 -40.5 115.5 -40.5 105.9 C-40.5 97.6 -40.5 89.3 -40.5 81 C-40.5 76 -40.6 71.1 -40.6 66.2 C-40.6 61.5 -40.6 56.8 -40.6 52.2 C-40.6 50.5 -40.6 48.8 -40.6 47.1 C-40.6 32.8 -39.8 20.9 -29.7 9.9 C-21.2 1.9 -11.2 0.1 0 0 Z M-18.5 23.4 C-18.9 24.1 -19.4 24.8 -19.8 25.6 C-20.3 26.3 -20.8 27 -21.2 27.8 C-24 33.9 -23.5 40.5 -23.4 47.1 C-23.4 48 -23.4 48.9 -23.4 49.9 C-23.4 53.3 -23.4 56.7 -23.4 60.1 C-23.4 67.7 -23.4 75.3 -23.3 83.2 C-0.2 83.2 22.9 83.2 46.7 83.2 C46.7 75.3 46.8 67.4 46.9 59.2 C46.9 56.7 46.9 54.2 47 51.7 C47 49.7 47 47.7 47 45.7 C47 44.7 47 43.7 47 42.6 C47 34.3 45.7 27.4 39.7 21.2 C34 17.2 29 17 22.3 17 C21.5 17 20.7 16.9 19.8 16.9 C18.1 16.9 16.4 16.9 14.6 16.9 C12.9 16.9 11.1 16.9 9.4 16.9 C-5.8 16.2 -5.8 16.2 -18.5 23.4 Z M-23.3 101.2 C-23.4 120.2 -23.4 120.2 -23.5 139.2 C-23.5 146.9 -23.6 154.6 -23.6 162.4 C-23.7 168.6 -23.7 174.9 -23.7 181.1 C-23.7 183.5 -23.7 185.9 -23.8 188.2 C-23.8 191.6 -23.8 194.9 -23.8 198.3 C-23.8 199.2 -23.8 200.2 -23.8 201.2 C-23.8 208.1 -22.6 214.4 -17.9 219.8 C-12.3 224.9 -6.2 225.5 1.1 225.5 C2.3 225.5 2.3 225.5 3.5 225.5 C5.2 225.5 6.8 225.5 8.5 225.5 C11 225.5 13.6 225.5 16.1 225.6 C17.8 225.6 19.4 225.6 21 225.6 C22.1 225.6 22.1 225.6 23.3 225.6 C29.5 225.5 35.1 224.4 40 220.3 C40.5 219.6 41 218.9 41.6 218.2 C42.2 217.5 42.8 216.8 43.3 216.1 C45.5 213 45.8 210.4 45.8 206.7 C45.8 205.7 45.8 204.8 45.8 203.8 C45.8 202.8 45.8 201.8 45.8 200.8 C45.8 199.7 45.8 198.6 45.8 197.5 C45.8 194 45.8 190.4 45.8 186.8 C45.8 184.4 45.8 181.9 45.8 179.5 C45.8 173 45.8 166.5 45.7 160 C45.7 152.2 45.7 144.4 45.7 136.7 C45.7 124.8 45.7 113 45.7 101.2 C22.9 101.2 0.1 101.2 -23.3 101.2 Z " transform="translate(115.3,109.8)"/><path d="M0 0 C1.1 -0 2.2 -0 3.3 -0 C6.9 -0 10.5 -0 14.1 -0 C16.7 -0 19.3 -0 21.9 -0 C28.3 -0.1 34.6 -0.1 40.9 -0.1 C46 -0.1 51.2 -0.1 56.3 -0.1 C57.4 -0.1 57.4 -0.1 58.5 -0.1 C60 -0.1 61.5 -0.1 63 -0.1 C77 -0.1 90.9 -0.1 104.9 -0.1 C117.6 -0 130.3 -0.1 143.1 -0.1 C156.2 -0.1 169.3 -0.1 182.4 -0.1 C183.9 -0.1 185.4 -0.1 186.9 -0.1 C188 -0.1 188 -0.1 189.1 -0.1 C194.2 -0.1 199.3 -0.1 204.5 -0.1 C211.4 -0.2 218.3 -0.1 225.2 -0.1 C227.7 -0.1 230.3 -0.1 232.8 -0.1 C249.3 -0.2 261.9 -0.1 274.5 11.9 C279.6 18 283.8 26 283.8 34.1 C283.8 35.1 283.8 36 283.8 37 C283.9 38.5 283.9 38.5 283.9 40.1 C283.9 41.2 283.9 42.3 283.9 43.4 C283.9 47.1 283.9 50.7 283.9 54.3 C283.9 55.6 283.9 56.8 283.9 58.1 C284 63.3 284 68.5 284 73.7 C284 81.2 284.1 88.6 284.1 96.1 C284.1 102 284.2 107.9 284.2 113.7 C284.2 116.2 284.2 118.7 284.2 121.2 C284.2 124.7 284.2 128.2 284.2 131.7 C284.3 132.8 284.3 133.8 284.3 134.8 C284.2 146 279.9 155.3 272.3 163.3 C266.5 168.2 258.4 172.8 250.6 172.5 C249.8 172.5 249 172.5 248.2 172.4 C246.9 172.4 246.9 172.4 245.6 172.4 C242.7 172.3 239.9 172.3 237.1 172.3 C235.2 172.3 233.2 172.2 231.3 172.2 C219.4 171.4 219.4 171.4 209 176.3 C206.6 178.9 204.6 181.8 202.7 184.8 C200.9 187.6 198.9 190.2 196.8 192.8 C196 193.9 195.1 195 194.3 196.1 C191.4 199.9 188.4 203.6 185.3 207.3 C180.9 212.8 176.5 218.3 172.2 223.9 C167.7 230 163 235.9 158.2 241.8 C157.6 242.5 157 243.2 156.4 243.9 C147.9 254.1 147.9 254.1 144.6 255.1 C141.3 255 139 254.7 136.2 253 C134 249.4 133.9 246.6 134.7 242.5 C135.4 240.3 136.2 238.2 137 236.1 C144.3 216.6 144.1 197.1 138.1 177.3 C137.7 175.9 137.7 175.9 137.3 174.6 C137 173.6 137 173.6 136.7 172.5 C135.8 172.5 134.9 172.5 134.1 172.5 C126 172.6 117.9 172.7 109.9 172.7 C105.7 172.7 101.6 172.8 97.4 172.8 C93.4 172.9 89.4 172.9 85.4 172.9 C83.9 172.9 82.4 172.9 80.9 172.9 C78.7 173 76.6 173 74.5 173 C72.6 173 72.6 173 70.8 173 C67.1 172.4 65.9 171.4 63.7 168.5 C63.1 166.5 63.1 166.5 63.2 164.5 C63.1 163.5 63.1 163.5 63.1 162.5 C63.9 159.5 65.2 158.4 67.7 156.5 C70.3 156.1 72.5 155.9 75.2 156 C76.3 155.9 76.3 155.9 77.5 155.9 C80 155.9 82.5 155.9 84.9 155.9 C86.7 155.9 88.4 155.9 90.1 155.9 C93.8 155.9 97.4 155.9 101 155.9 C105.7 155.9 110.3 155.9 115 155.8 C118.5 155.8 122.1 155.8 125.7 155.8 C127.4 155.8 129.1 155.8 130.8 155.8 C133.2 155.7 135.6 155.8 138 155.8 C138.7 155.8 139.4 155.7 140.1 155.7 C142.9 155.8 145 156 147.2 157.8 C158.9 171.6 160.3 191.3 161.7 208.5 C162.3 207.7 162.9 206.9 163.6 206 C169.3 198.8 175 191.6 180.8 184.5 C184.8 179.5 188.8 174.5 192.7 169.5 C193.5 168.4 194.4 167.3 195.3 166.3 C196.8 164.5 196.8 164.5 198 162.1 C200.4 158.7 202.4 156 206.7 155.1 C212.8 154.4 219 154.8 225.1 155.1 C227.9 155.2 230.7 155.2 233.4 155.3 C235.2 155.4 236.9 155.4 238.6 155.5 C246.4 155.8 253.8 155 260.2 150.1 C266.8 143.2 266.8 134.1 266.8 125.2 C266.8 124.2 266.8 123.3 266.8 122.4 C266.8 119.3 266.8 116.3 266.8 113.2 C266.8 111.1 266.8 109 266.8 106.9 C266.8 102.4 266.9 98 266.8 93.5 C266.8 87.9 266.9 82.2 266.9 76.5 C266.9 72.1 266.9 67.7 266.9 63.3 C266.9 61.2 266.9 59.2 266.9 57.1 C266.9 54.1 266.9 51.2 266.9 48.2 C266.9 47.4 266.9 46.5 266.9 45.7 C266.9 37.9 266.1 30.3 261.2 24 C254.4 17.4 245.6 17.4 236.6 17.4 C235.6 17.4 234.6 17.4 233.5 17.4 C230.1 17.4 226.7 17.4 223.3 17.4 C220.8 17.4 218.4 17.4 215.9 17.4 C209.9 17.4 204 17.4 198 17.4 C193.2 17.4 188.3 17.4 183.4 17.3 C169.7 17.3 155.9 17.3 142.2 17.3 C141.4 17.3 140.7 17.3 139.9 17.3 C139.2 17.3 138.4 17.3 137.7 17.3 C125.6 17.3 113.6 17.3 101.5 17.3 C89.2 17.3 76.8 17.3 64.5 17.3 C57.5 17.3 50.6 17.3 43.6 17.3 C37.1 17.3 30.6 17.3 24.1 17.3 C21.7 17.3 19.3 17.3 16.9 17.3 C13.6 17.3 10.3 17.3 7.1 17.3 C6.1 17.3 5.2 17.3 4.2 17.2 C-4 17.3 -10.8 18.3 -17.3 23.5 C-22.1 28.7 -23.5 33.7 -24.7 40.4 C-25.5 42.9 -26.3 43.9 -28.3 45.5 C-31.8 46.3 -34.3 46.9 -37.6 45.8 C-40 44 -41.2 42.3 -41.7 39.4 C-41.9 28.9 -38.1 19.5 -31.3 11.5 C-22.5 2.8 -12.2 -0.1 0 0 Z " transform="translate(152.3,39.5)"/><path d="M0 0 C0.7 -0 1.4 -0.1 2.1 -0.1 C7.3 -0.1 10.1 0.9 14.2 4.3 C18.5 9 19.7 12.7 19.6 18.9 C18.8 24.2 15.9 28.1 11.7 31.2 C5.1 34.1 -2.3 34.4 -9.1 32.1 C-14.1 30 -16.6 26.2 -18.8 21.3 C-19.5 15.7 -19 11.1 -15.8 6.3 C-10.7 1.3 -7 0.1 0 0 Z " transform="translate(367.8,97.7)"/><path d="M0 0 C0.7 -0 1.4 -0.1 2.1 -0.1 C7.3 -0.1 10.1 0.9 14.2 4.3 C18.2 8.8 19.6 12.1 19.5 18.1 C18.8 23.6 16.5 27.3 12.2 30.8 C6.2 33.9 -0.3 34.2 -7 32.9 C-12.2 31.2 -14.7 28.8 -17.8 24.3 C-19.2 20 -19.3 15.9 -18.8 11.3 C-14.5 2.9 -9 0.1 0 0 Z " transform="translate(316.8,97.7)"/><path d="M0 0 C2.2 1.4 2.2 1.4 4 4 C4.6 7.7 4.6 11.3 4.5 15 C4.5 16 4.5 17.1 4.5 18.2 C4.5 20.5 4.5 22.8 4.5 25 C4.5 28.5 4.5 32 4.5 35.4 C4.5 37.6 4.5 39.8 4.5 42 C4.5 43.1 4.5 44.1 4.6 45.2 C4.5 52.3 4.5 52.3 2.2 55.6 C-1 57.6 -3.3 58 -7 58 C-9.8 56.2 -11.5 55 -13 52 C-13.1 50.5 -13.2 49 -13.2 47.5 C-13.2 46.1 -13.2 46.1 -13.2 44.7 C-13.2 43.7 -13.2 42.7 -13.2 41.7 C-13.2 40.7 -13.2 39.6 -13.3 38.6 C-13.3 36.4 -13.3 34.2 -13.3 32 C-13.3 28.7 -13.4 25.4 -13.4 22.1 C-13.4 19.9 -13.4 17.8 -13.4 15.7 C-13.4 14.7 -13.5 13.7 -13.5 12.7 C-13.5 8.3 -13.4 5.7 -11.2 1.9 C-7.4 -1.4 -4.7 -1.2 0 0 Z " transform="translate(129,227)"/><path d="M0 0 C4.9 2.3 7.7 5.1 10 10 C10.8 15.6 10.8 20.3 8.3 25.5 C4 30.2 0.8 32.8 -5.7 33.3 C-10.4 33.2 -14.2 31.8 -18 29 C-22.3 23.6 -23.7 18.9 -23 12 C-19.1 1.1 -10.6 -1 0 0 Z " transform="translate(222,98)"/><path d="M0 0 C4.5 2.2 7.2 4.9 10 9 C11.8 14.4 11.7 19.1 9.4 24.2 C6.8 29 3.1 31.3 -2 33 C-7.6 33.4 -11.2 33.2 -16 30 C-20.1 25.8 -22.2 22.7 -22.3 16.8 C-22.2 11.2 -21.4 8.4 -18 4 C-12.8 -1.1 -6.8 -0.9 0 0 Z " transform="translate(272,98)"/></symbol><symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="12" height="12" rx="3.2" fill="none" stroke="currentColor" stroke-width="1.15"/><path d="M15.5 6.6V6.5a3 3 0 0 0-3-3h-6a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h.1" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round"/></symbol></defs></svg>
+  <div id="gate" role="dialog" aria-modal="true" aria-labelledby="gTitle">
+    <div class="gcard">
+      <div class="gmain" id="gMain">
+        <img class="glogo" src="/logo-128.webp" alt="" width="50" height="50" decoding="async" draggable="false">
+        <h1 id="gTitle">Welcome to Naive</h1>
+        <p>Please read our <button type="button" class="glink" data-t="terms">Terms of Use &amp; Disclaimer</button> and <button type="button" class="glink" data-t="privacy">Privacy Policy</button> before continuing.</p>
+        <div class="gnote">Naive is intended only for lawful, beneficial, and Islamic-purpose use.</div>
+        <label class="gchk"><input type="checkbox" id="gChk" autocomplete="off"><span>I have read and agree to the Terms and Privacy Policy.</span></label>
+        <div class="gbtns"><button type="button" id="gExit">Exit</button><button type="button" id="gOk" disabled>I Agree &amp; Continue</button></div>
+      </div>
+      <div class="gdeny" id="gDeny" hidden>
+        <h1>Agreement needed</h1>
+        <p>Naive can only be used after you agree to the Terms and Privacy Policy. You can close this window now.</p>
+        <div class="gbtns"><button type="button" id="gBack" style="background:#111827;color:#fff">Review again</button></div>
+      </div>
+    </div>
+    <div class="gt" id="gT" hidden>
+      <div class="gth"><button type="button" id="gTb">Back</button><b>Terms of Use &amp; Disclaimer</b></div>
+      <div class="gtb" id="gTx">Loading…</div>
+    </div>
+  </div>
+
+  <div class="app">
+    <header class="top">
+      <div class="logo"><img src="/logo-128.webp" alt="Naive" width="44" height="44" decoding="async" draggable="false"></div>
+      <div class="brand">
+        <h1>Naive</h1>
+      </div>
+      <div class="mwrap">
+        <button class="mbtn" id="menuBtn" type="button" aria-label="Menu" aria-haspopup="menu" aria-expanded="false"><svg class="ic"><use href="#i-menu"/></svg><i class="mdot" id="mdot" hidden></i></button>
+        <div class="mmenu" id="menu" role="menu" hidden>
+          <button class="mitem" id="sttOpen" type="button" role="menuitem" aria-haspopup="dialog" aria-label="Speech to Text" title="Speech to Text"><svg class="ic"><use href="#i-stt"/></svg></button>
+          <button class="mitem" id="webLink" type="button" role="menuitem" aria-label="Open the Naive website" title="Naive website"><svg class="ic"><use href="#i-web"/></svg></button>
+          <button class="mitem" id="up" type="button" role="menuitem" aria-label="Updates" title="Updates"><svg class="ic"><use href="#i-update"/></svg><span class="bell" id="bell" hidden><svg viewBox="0 0 24 24"><path d="M12 2a6 6 0 0 0-6 6v3.6L4.3 15a1 1 0 0 0 .9 1.5h13.6a1 1 0 0 0 .9-1.5L18 11.6V8a6 6 0 0 0-6-6Zm-2.5 16.5a2.5 2.5 0 0 0 5 0Z"/></svg></span></button>
+        </div>
+      </div>
+    </header>
+
+    <section class="pane on" id="p1">
+      <div class="hero">
+        <h2>Download anything.</h2>
+        <p>Paste a video link and choose your quality.</p>
+        <div class="srcs">
+          <img src="/img/icons8-youtube-logo-94.png" alt="YouTube" style="--n:0">
+          <img src="/img/icons8-tiktok-logo-94.png" alt="TikTok" style="--n:1">
+          <img src="/img/icons8-facebook-logo-94.png" alt="Facebook" style="--n:2">
+          <img src="/img/icons8-instagram-logo-94.png" alt="Instagram" style="--n:3">
+        </div>
+        <form id="f" class="search" autocomplete="off">
+          <svg viewBox="0 0 50 50" fill="currentColor" aria-hidden="true"><path d="M 21 3 C 11.621094 3 4 10.621094 4 20 C 4 29.378906 11.621094 37 21 37 C 24.710938 37 28.140625 35.804688 30.9375 33.78125 L 44.09375 46.90625 L 46.90625 44.09375 L 33.90625 31.0625 C 36.460938 28.085938 38 24.222656 38 20 C 38 10.621094 30.378906 3 21 3 Z M 21 5 C 29.296875 5 36 11.703125 36 20 C 36 28.296875 29.296875 35 21 35 C 12.703125 35 6 28.296875 6 20 C 6 11.703125 12.703125 5 21 5 Z"/></svg>
+          <input id="q" placeholder="Paste a video or reel link…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" inputmode="url">
+          <button class="go" id="pb" type="button" data-m="p" aria-label="Paste">
+            <svg class="pi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4.5h6M9 11h6M9 15h4"/></svg>
+            <svg class="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          </button>
+        </form>
+        <div id="msg"></div>
+        <div class="chips" id="rc"></div>
+        <div class="load" id="ld" hidden>
+          <div class="lring">
+            <svg viewBox="0 0 44 44" fill="none" stroke-width="5">
+              <circle class="tr" cx="22" cy="22" r="18" />
+              <circle class="pg" id="lp" cx="22" cy="22" r="18" stroke-linecap="round" stroke-dasharray="113.1" stroke-dashoffset="113.1" />
+            </svg>
+            <b id="lpc">0%</b>
+          </div>
+          <div class="lt">
+            <strong id="ll">Starting</strong>
+            <small id="ls"></small>
+          </div>
+          <button class="lc" id="lc">Cancel</button>
+        </div>
+      </div>
+      <div id="res"></div>
+      <div class="tree" aria-hidden="true"><img src="/img/tree.webp" alt="" width="600" height="456" decoding="async" draggable="false"></div>
+    </section>
+
+    <section class="pane" id="p2">
+      <div class="downloads">
+        <div class="section" style="padding-top:2px">
+          <h2>Downloads <small id="cnt"></small></h2>
+          <button class="sec" id="clear" hidden>Clear All</button>
+        </div>
+        <div class="seg" id="flt">
+          <button class="on" data-f="all">All</button>
+          <button data-f="active">Active</button>
+          <button data-f="done">Done</button>
+        </div>
+        <div class="list" id="jobs" data-f="all">
+          <div class="empty" id="empty">
+            <svg class="ic"><use href="#i-folder"/></svg>
+            <p>Your downloads will appear here.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <nav class="tab">
+    <button class="on" data-p="p1" aria-label="Discover"><svg class="ic"><use href="#i-home"/></svg></button>
+    <button data-p="p2" aria-label="Downloads"><svg class="ic"><use href="#i-downloads"/></svg><em id="bd" hidden></em></button>
+  </nav>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5ac8fa"/><stop offset="1" stop-color="#0a84ff"/></linearGradient></defs></svg>
+  <div id="toasts"></div>
+  <dialog id="dlg" autofocus></dialog>
+  <dialog id="udlg"></dialog>
+
+  <!-- Speech to Text: full-screen view opened from the header link (logic in /stt.js, styles in /stt.css) -->
+  <div id="stt" role="dialog" aria-modal="true" aria-labelledby="sttTitle" hidden>
+    <main class="stt-app">
+      <header class="stt-top">
+        <button class="stt-back" id="sttBack" type="button" aria-label="Back to Naive">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>
+        </button>
+        <h1 id="sttTitle">Speech to Text</h1>
+      </header>
+
+      <section class="stt-hero">
+        <h2>Turn your voice <span>into words.</span></h2>
+        <p>Upload an audio speech and get a clean, editable transcript.</p>
+
+        <div class="stt-drop" id="sttDrop">
+          <input id="sttInput" type="file" accept="audio/*,.mp3,.wav,.m4a,.aac,.flac,.ogg,.webm" hidden>
+          <img class="stt-art" loading="lazy" src="/img/audio-to-text.webp" alt="" width="760" height="491" decoding="async" draggable="false">
+          <h3><span class="stt-desk">Drop your audio here</span><span class="stt-touch">Add your audio</span></h3>
+          <p>or choose a file from your device</p>
+          <button class="stt-btn" id="sttPick" type="button">Choose Audio</button>
+          <div class="stt-note">MP3 · WAV · M4A · AAC · FLAC · OGG · WEBM</div>
+        </div>
+
+        <div class="stt-file" id="sttFile" hidden>
+          <div class="stt-fhead">
+            <div class="stt-ficon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M13 3H7.5A2.5 2.5 0 0 0 5 5.5v13A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V8l-6-5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M13 3v5h6M9 14.5a3 3 0 0 0 6 0M12 11.5v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            </div>
+            <div class="stt-fmeta"><strong id="sttName">audio.mp3</strong><small id="sttSize">0 MB</small></div>
+            <button class="stt-x" id="sttRemove" type="button" aria-label="Remove audio">&times;</button>
+          </div>
+          <audio id="sttAudio" controls preload="metadata"></audio>
+          <div class="stt-langrow">
+            <label for="sttLang">Spoken language</label>
+            <select class="stt-select unset" id="sttLang" required><option value="" selected disabled>Select</option><option value="en">English</option><option value="ur">Urdu</option><option value="hi">Hindi</option><option value="ar">Arabic</option></select>
+          </div>
+          <p class="stt-hint" id="sttHint" role="alert" hidden>Select the spoken language first.</p>
+          <button class="stt-go" id="sttGo" type="button" aria-disabled="true">Transcribe Audio</button>
+        </div>
+
+        <div class="load" id="sttLoad" hidden>
+          <div class="lring">
+            <svg viewBox="0 0 44 44" fill="none" stroke-width="5">
+              <circle class="tr" cx="22" cy="22" r="18" />
+              <circle class="pg" id="sttLp" cx="22" cy="22" r="18" stroke-linecap="round" stroke-dasharray="113.1" stroke-dashoffset="113.1" />
+            </svg>
+            <b id="sttLpc">0%</b>
+          </div>
+          <div class="lt"><strong id="sttLl">Uploading audio…</strong><small id="sttLs"></small></div>
+          <button class="lc" id="sttCancel" type="button">Cancel</button>
+        </div>
+
+        <div class="stt-err" id="sttErr" role="alert" hidden>
+          <i aria-hidden="true">!</i>
+          <div><strong id="sttErrTitle">Something went wrong</strong><p id="sttErrText">Please try again.</p>
+            <div class="stt-erract" id="sttErrAct" hidden><button class="stt-mini" id="sttUseDet" type="button"></button><button class="stt-mini ghost" id="sttKeep" type="button"></button></div></div>
+          <button class="stt-x" id="sttErrX" type="button" aria-label="Dismiss">&times;</button>
+        </div>
+      </section>
+
+      <section class="stt-res" id="sttResult" hidden>
+        <div class="stt-rhead">
+          <h2>Transcription</h2>
+          <div class="stt-acts">
+            <button class="stt-ibtn" id="sttCopy" type="button" aria-label="Copy transcript" title="Copy">
+              <svg class="ic stt-i"><use href="#i-copy"/></svg>
+              <span class="stt-tick" aria-hidden="true"></span>
+            </button>
+            <button class="stt-ibtn" id="sttSave" type="button" aria-label="Download transcript" title="Download">
+              <svg class="ic stt-i"><use href="#i-note"/></svg>
+            </button>
+          </div>
+        </div>
+        <textarea id="sttText" spellcheck="true" aria-label="Transcript"></textarea>
+        <div class="stt-rfoot">
+          <button class="stt-newbtn" id="sttNew" type="button" aria-label="Another audio" title="Another audio"><svg class="ic"><use href="#i-newaudio"/></svg></button>
+        </div>
+      </section>
+    </main>
+    <div class="stt-toast" id="sttToast" role="status"></div>
+  </div>
+
+  <script>
+    // ========== CONFIG ==========
+    // Set this to your Railway downloader URL after you deploy it.
+    // Leave empty ("") only for fully local testing.
+    const DOWNLOADER_URL = (window.NAIVE_DOWNLOADER_URL || localStorage.getItem('naive.downloaderUrl') || '').replace(/\/$/, '');
+    const dl = (path) => (DOWNLOADER_URL ? DOWNLOADER_URL : '') + path;
+    // ============================
+
+    const $ = s => document.querySelector(s);
+    const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const dur = s => s ? [s / 3600 | 0, s / 60 % 60 | 0, s % 60 | 0].map(n => String(n).padStart(2, '0')).join(':').replace(/^00:/, '') : '';
+    const fsz = b => b ? (b >= 1e9 ? (b / 1e9).toFixed(2) + ' GB' : (b / 1e6).toFixed(b < 1e7 ? 1 : 0) + ' MB') : '';
+    const api = (u, o) => fetch(u, o).then(async r => {
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw Error(j.error || 'Request failed');
+      return j;
+    });
+    const msg = t => $('#msg').textContent = t || '';
+
+    let cur;
+    let LBL = {};
+    const TIERS = [[8640, '16K'], [4320, '8K'], [2160, '4K'], [1440, '2K'], [1080, 'Full HD'], [720, 'HD'], [480, 'SD'], [360, 'SD'], [240, 'LD'], [144, 'MD']];
+    function qRows(o, v) {
+      if (S.tab === 'audio') return o.map((x, i) => x.kind === 'audio' ? { i, text: x.label || x.container.toUpperCase() } : 0).filter(Boolean);
+      const vids = o.map((x, i) => ({ x, i })).filter(r => r.x.kind === 'video');
+      if (vids.some(r => r.x.dl)) return vids.map(r => ({ i: r.i, text: r.x.label })); // TikTok: keep its own names
+      const best = new Map(); // one row per resolution (prefer MP4)
+      vids.forEach(r => {
+        const c = best.get(r.x.height);
+        if (!c || (r.x.container === 'mp4' && c.x.container !== 'mp4')) best.set(r.x.height, r);
+      });
+      const seen = new Set(), rows = [];
+      [...best.values()].sort((a, b) => (b.x.height || 0) - (a.x.height || 0)).forEach(r => {
+        const m = /^(\d+)p(\d+)?$/.exec(r.x.label || '');
+        if (!m) return rows.push({ i: r.i, text: r.x.label || 'Best quality' });
+        const h = r.x.height, side = v && v.h > v.w && v.w ? h * v.w / v.h : h; // vertical videos report their long side
+        const t = TIERS.find(z => z[0] <= side * 1.1) || TIERS[TIERS.length - 1];
+        if (seen.has(t[0])) return;
+        seen.add(t[0]);
+        rows.push({ i: r.i, name: t[1], res: t[0] + 'p', h: t[0], text: t[1] + ' (' + t[0] + 'p)' });
+      });
+      return rows;
+    }
+    let items = [];
+    let S = { tab: 'video', tpl: '$title' };
+
+    // recommended row: the best quality up to Full HD (1080p). Higher qualities (2K, 4K...) stay in the list, but Full HD is still the recommended one.
+    // Rows without a known size (TikTok, Best quality...) recommend the first row.
+    function recIndex(rows) {
+      const known = rows.map((r, i) => ({ r, i })).filter(x => x.r.h);
+      if (!known.length) return 0;
+      const ok = known.filter(x => x.r.h <= 1080).sort((a, b) => b.r.h - a.r.h)[0];
+      return (ok || known.sort((a, b) => a.r.h - b.r.h)[0]).i;
+    }
+
+    const TB = [...document.querySelectorAll('.tab button')], PN = [...document.querySelectorAll('.pane')];
+    document.querySelector('.tab').onclick = e => {
+      let b = e.target.closest('[data-p]');
+      if (!b) return;
+      if (b.classList.contains('on')) return;
+      TB.forEach(x => x.classList.toggle('on', x === b)); // the button reacts at once...
+      const id = b.dataset.p;
+      requestAnimationFrame(() => setTimeout(() => PN.forEach(x => x.classList.toggle('on', x.id === id)), 0)); // ...then the page swaps after that frame is on screen
+    };
+
+    $('#flt').onclick = e => {
+      let b = e.target.closest('[data-f]');
+      if (!b) return;
+      $('#jobs').dataset.f = b.dataset.f;
+      document.querySelectorAll('#flt button').forEach(x => x.classList.toggle('on', x === b));
+    };
+
+    const rcGet = () => {
+      try {
+        return JSON.parse(localStorage.rc || '[]');
+      } catch {
+        return [];
+      }
+    };
+
+    const rcDraw = () => $('#rc').innerHTML = rcGet().map((r, i) => `<button class="chip" data-i="${i}">${esc(r)}</button>`).join('');
+    rcDraw();
+
+    $('#rc').onclick = e => {
+      let b = e.target.closest('.chip');
+      if (b) {
+        $('#q').value = rcGet()[b.dataset.i];
+        sync();
+        search($('#q').value.trim());
+      }
+    };
+
+    // ---- the box: empty = Paste button; typing or pasting a link / name starts the search by itself (no Find button)
+    const Q = $('#q'), PB = $('#pb');
+    let lastQ = '', plTimer = 0, seq = 0;
+    const sync = () => {
+      const has = !!Q.value.trim();
+      PB.dataset.m = has ? 'x' : 'p';
+      PB.setAttribute('aria-label', has ? 'Clear' : 'Paste');
+    };
+    const asLink = v => /^(www\.)?(youtube\.com|youtu\.be|m\.youtube\.com|tiktok\.com|vm\.tiktok\.com|facebook\.com|fb\.watch|instagram\.com)\//i.test(v) ? 'https://' + v : v;
+    function plan(now) {
+      clearTimeout(plTimer);
+      sync();
+      const v = Q.value.trim();
+      if (!v) { stopResolve(); lastQ = ''; msg(''); return; }
+      if (v === lastQ) return;
+      msg('');
+      const link = /^(https?:\/\/|www\.)/i.test(v) || /^[\w.-]+\.[a-z]{2,}\//i.test(v);
+      if (!link && v.length < 3) return;
+      plTimer = setTimeout(() => search(v), now ? 0 : link ? 300 : 700);
+    }
+    Q.addEventListener('input', () => plan(false));
+    Q.addEventListener('paste', () => setTimeout(() => plan(true), 0));
+    PB.onclick = async () => {
+      if (PB.dataset.m === 'x') { Q.value = ''; $('#res').innerHTML = ''; plan(true); Q.focus(); return; }
+      try {
+        const t = (await navigator.clipboard.readText()).trim();
+        if (t) { Q.value = t; plan(true); } else msg('Nothing copied yet.');
+      } catch {
+        Q.focus(); msg('Tap and hold the box, then choose Paste.');
+      }
+    };
+
+    addEventListener('paste', e => {
+      if (document.activeElement !== Q && !$('#dlg').open && !$('#udlg').open && $('#stt').hidden) {
+        let t = e.clipboardData.getData('text').trim();
+        if (t) { Q.value = t; plan(true); }
+      }
+    });
+
+    const LC = 113.1;
+    let es, t0, tk;
+
+    function setLoad(d) {
+      if (d.pct != null) {
+        $('#lp').style.strokeDashoffset = LC * (1 - d.pct / 100);
+        $('#lpc').textContent = d.pct + '%';
+      }
+      if (d.label) $('#ll').textContent = d.label;
+      if (d.detail != null) $('#ls').dataset.d = d.detail;
+      $('#ls').textContent = ((Date.now() - t0) / 1000).toFixed(1) + 's' + ($('#ls').dataset.d ? ' · ' + $('#ls').dataset.d : '');
+    }
+
+    function loadOn() {
+      t0 = Date.now();
+      $('#ld').hidden = false;
+      setLoad({ pct: 0, label: 'Starting' });
+      tk = setInterval(() => setLoad({}), 250);
+    }
+
+    function loadOff() {
+      clearInterval(tk);
+      if (es) es.close();
+      $('#ld').hidden = true;
+    }
+
+    let pend = null;
+    function stopResolve() { // a new search (or Cancel) ends the one still running; the server stops its yt-dlp too
+      if (es) { es.close(); es = null; }
+      if (!$('#ld').hidden) loadOff();
+      if (pend) { const p = pend; pend = null; p(); }
+    }
+
+    function resolve(q) {
+      stopResolve();
+      return new Promise(res => {
+        pend = res;
+        const done = v => { if (pend === res) pend = null; res(v); };
+        msg('');
+        loadOn();
+        const my = es = new EventSource(dl('/api/resolve/stream?q=' + encodeURIComponent(q));
+        my.addEventListener('stage', e => setLoad(JSON.parse(e.data)));
+        my.addEventListener('result', e => {
+          my.close();
+          let r = JSON.parse(e.data);
+          loadOff();
+          done(r);
+        });
+        my.addEventListener('fail', e => {
+          my.close();
+          loadOff();
+          msg(JSON.parse(e.data).error);
+          done();
+        });
+        my.onerror = () => {
+          if (my.readyState === 2 && es === my) {
+            loadOff();
+            msg('Lost connection to Naive.');
+            done();
+          }
+        };
+        $('#lc').onclick = () => { stopResolve(); };
+      });
+    }
+
+    async function search(q) {
+      q = asLink(String(q || '').trim());
+      if (!q) return;
+      lastQ = Q.value.trim();
+      const my = ++seq;
+      let r = await resolve(q);
+      if (!r || my !== seq) return;
+      localStorage.rc = JSON.stringify([lastQ, ...rcGet().filter(x => x !== lastQ)].slice(0, 6));
+      rcDraw();
+      if (r.type === 'video') {
+        $('#res').innerHTML = '';
+        openDlg(r);
+        return;
+      }
+      items = r.items || [];
+      $('#res').innerHTML = `<div class="section"><h2>${esc(r.title || 'Results')}</h2>${r.type === 'playlist' ? '<button class="sec" id="all">Queue All</button>' : ''}</div><div class="grid">${items.map((v, i) => `<button class="card" data-i="${i}"><div class="tw"><img loading="lazy" decoding="async" referrerpolicy="no-referrer" src="${esc(v.thumb)}">${v.duration ? `<i>${dur(v.duration)}</i>` : ''}</div><div class="cb"><b>${esc(v.title)}</b><span>${esc(v.author || '')}</span></div></button>`).join('')}</div>`;
+      if ($('#all')) $('#all').onclick = () => {
+        items.forEach(v => queue(v, { kind: 'video', container: 'mp4', height: 4320, template: '$title' }));
+        goTab('p2');
+      };
+    }
+
+    $('#f').onsubmit = e => { // Enter on the keyboard searches right away
+      e.preventDefault();
+      clearTimeout(plTimer);
+      const v = Q.value.trim();
+      if (v) { Q.blur(); search(v); }
+    };
+
+    $('#res').onclick = async e => {
+      let c = e.target.closest('.card');
+      if (!c) return;
+      let r = await resolve(items[c.dataset.i].url);
+      if (r && r.type === 'video') openDlg(r);
+    };
+
+    const goTab = p => document.querySelector(`.tab [data-p=${p}]`).click();
+
+    function openDlg(r) {
+      cur = r;
+      S = { tab: 'video', tpl: '$title' };
+      draw();
+      const d = $('#dlg'); d.classList.remove('closing');
+      if (!d.open) d.showModal();
+      if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur(); // no focus ring on open
+    }
+
+    function draw() {
+      let v = cur.video;
+      let o = cur.options;
+      let rows = qRows(o, v);
+      LBL = {};
+      rows.forEach(r => LBL[r.i] = r.text);
+      let vert = v.h > v.w;
+      let rec = recIndex(rows);
+
+      $('#dlg').innerHTML = `<div class="grab"></div><div class="dt ${vert ? 'v' : ''}"><div class="pv" style="aspect-ratio:${vert ? '9/16' : (v.w && v.h ? v.w + '/' + v.h : '16/9')}"><img referrerpolicy="no-referrer" decoding="async" draggable="false" src="${esc(v.thumb)}"></div><div><b>${esc(v.title)}</b><span>${esc(v.author || '')} ${dur(v.duration)}${v.site ? ' · ' + (v.site === 'facebook' ? 'Facebook' : 'Instagram') : ''}</span></div></div><div class="db"><div class="seg"><button data-t="video" class="${S.tab === 'video' ? 'on' : ''}">Video</button><button data-t="audio" class="${S.tab === 'audio' ? 'on' : ''}">Audio</button></div><div class="opts">${rows.length ? rows.map((r, i) => `<label class="opt${i === rec ? ' rec' : ''}"><input type="radio" name="o" value="${r.i}" ${i === rec ? 'checked' : ''}><span>${esc(r.name || r.text)}${r.res ? ` <span class="rs">(${r.res})</span>` : ''}</span>${i === rec ? '<img class="gq" src="/img/icons8-good-quality-32.png" alt="" draggable="false">' : ''}</label>`).join('') : '<p style="padding:14px">No formats found.</p>'}</div></div><div class="db2"><button class="cancel" id="cx">Cancel</button><button class="download" id="ok">Download</button></div>`;
+      const on = $('#dlg').querySelector('input:checked'); if (on) requestAnimationFrame(() => on.closest('.opt').scrollIntoView({ block: 'nearest' }));
+    }
+
+    // closing animation for sheets: slide + fade out, then the real close
+    function closeSheet(d) {
+      if (!d.open || d.classList.contains('closing')) return;
+      d.classList.add('closing');
+      setTimeout(() => { d.classList.remove('closing'); d.close(); }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 170);
+    }
+    ['dlg', 'udlg'].forEach(id => $('#' + id).addEventListener('cancel', e => { e.preventDefault(); closeSheet(e.target); })); // Esc / phone back
+
+    $('#dlg').onclick = e => {
+      let t = e.target;
+      let d = $('#dlg');
+      if (t.dataset.t) {
+        S.tab = t.dataset.t;
+        draw();
+      } else if (t.id === 'cx' || t === d) {
+        closeSheet(d);
+      } else if (t.id === 'ok') {
+        let s = d.querySelector('input[name=o]:checked');
+        if (!s) return;
+        let o = cur.options[s.value];
+        queue(cur.video, { ...o, label: LBL[s.value] || o.label, template: '$title' });
+        closeSheet(d);
+      }
+    };
+
+    const R = new Map();
+    const RAD = 13.5;
+    const C = 2 * Math.PI * RAD;
+    const norm = s => ({ completed: 'done', complete: 'done', finished: 'done', success: 'done', failed: 'error', cancelled: 'canceled' }[String(s || '').toLowerCase()] || String(s || 'queued').toLowerCase());
+    const IF = '<svg class="ic"><use href="#i-folder"/></svg>';
+    const IP = '<svg class="ic"><use href="#i-play"/></svg>';
+    const ID = '<svg class="ic"><use href="#i-remove"/></svg>';
+
+    // small drawn icons (no animation library): a tick that draws itself, and an info mark
+    const CHK = '<svg class="chk" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 12.5l4.2 4.2 8.8-9.4"/></svg>';
+    const INF = '<svg class="chk s" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M12 10.5v7M12 6.6v.1"/></svg>';
+    const icon = (box, svg, play) => { box.innerHTML = svg; if (!play) box.firstChild.classList.add('s'); };
+
+    // nothing can be selected, copied, held or dragged, except inside the search box and the transcript box
+    const FREE = '.search input, #sttText';
+    ['dragstart', 'contextmenu', 'selectstart', 'copy', 'cut'].forEach(ev => document.addEventListener(ev, e => {
+      const n = e.target && e.target.nodeType === 1 ? e.target : e.target && e.target.parentElement;
+      if (!(n && n.closest && n.closest(FREE))) e.preventDefault();
+    }, true));
+
+    // "download complete" notice with the animated tick
+    function toast(j) {
+      const t = document.createElement('div');
+      t.className = 'toast';
+      t.innerHTML = `<span class="tk"></span><div class="tm"><div class="tt">Download complete</div><div class="tn">${esc(j.name || j.title || '')}</div>${j.folder ? `<div class="tp">Saved to ${esc(j.folder)}</div>` : ''}</div>`;
+      $('#toasts').append(t); icon(t.querySelector('.tk'), CHK, true);
+      const bye = () => { t.classList.add('out'); setTimeout(() => t.remove(), 220); };
+      t.onclick = () => { bye(); goTab('p2'); };
+      setTimeout(bye, 4000);
+    }
+
+    // ---- updates: bell shows while a new version has not been looked at yet
+    const U = { current: '', latest: '', available: false, notes: '', url: '', configured: false, error: false };
+    async function checkUpdate(force) {
+      try { Object.assign(U, await api(dl('/api/update') + (force ? '?force=1' : ''))); } catch { U.error = true; }
+      $('#bell').hidden = !(U.available && localStorage.seenUpdate !== U.latest); $('#mdot').hidden = $('#bell').hidden;
+    }
+    function drawU() {
+      const ok = !U.available, ico = ok ? CHK : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 22C14 22 14.85 21.88 18.36 18.36 21.88 14.85 21.88 9.15 18.36 5.64 17.12 4.39 15.6 3.59 14 3.22M14 22H20M14 22V16M10 2S9.15 2.12 5.64 5.64C2.12 9.15 2.12 14.85 5.64 18.36 6.88 19.61 8.4 20.41 10 20.78M10 2 4 2M10 2V8"/></svg>';
+      const h = U.available ? 'Update available' : U.error ? 'Couldn\u2019t check right now' : 'You\u2019re up to date';
+      const p = U.available ? `Naive ${esc(U.latest)} is ready. You have ${esc(U.current)}.${U.notes ? '<br>' + esc(U.notes) : ''}`
+        : U.error ? `Check your connection and try again. You\u2019re on ${esc(U.current)}.`
+        : `You are already up to date. Naive ${esc(U.current)} is the latest version.${U.configured ? '' : '<br><small>Naive</small>'}`;
+      $('#udlg').innerHTML = `<div class="grab"></div><div class="ub"><div class="ui ${ok ? 'ok' : ''}">${ico}</div><h3>${h}</h3><p>${p}</p></div><div class="db2"><button class="cancel" id="ux">${U.available ? 'Later' : 'Close'}</button>${U.available && U.url ? '<button class="download" id="uu">Update now</button>' : ''}</div>`;
+    }
+    $('#up').onclick = () => {
+      const b = $('#up'); b.classList.remove('spin'); void b.offsetWidth; b.classList.add('spin');
+      localStorage.seenUpdate = U.latest || ''; $('#bell').hidden = true; $('#mdot').hidden = true; // seen: the bell goes away
+      drawU(); const d = $('#udlg'); d.classList.remove('closing'); if (!d.open) d.showModal();
+      checkUpdate(true).then(() => { if (d.open) drawU(); });
+    };
+    $('#udlg').onclick = e => {
+      const t = e.target, d = $('#udlg');
+      if (t === d || t.id === 'ux') closeSheet(d);
+      else if (t.id === 'uu') { window.open(U.url, '_blank', 'noopener'); closeSheet(d); }
+    };
+
+    $('#webLink').onclick = () => window.open('https://naive-tan.vercel.app', '_blank', 'noopener,noreferrer');
+
+    // ---- top-left menu (icon-only dropdown)
+    (() => {
+      const mb = $('#menuBtn'), m = $('#menu');
+      let t = 0;
+      const shut = () => m.hidden || m.classList.contains('closing');
+      const open = () => { clearTimeout(t); m.classList.remove('closing'); m.hidden = false; mb.setAttribute('aria-expanded', 'true'); };
+      const close = () => {
+        if (shut()) return;
+        m.classList.add('closing'); mb.setAttribute('aria-expanded', 'false');
+        t = setTimeout(() => { m.hidden = true; m.classList.remove('closing'); }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 120);
+      };
+      mb.onclick = () => (shut() ? open() : close());
+      m.addEventListener('click', e => { if (e.target.closest('.mitem')) close(); });
+      document.addEventListener('pointerdown', e => { if (!shut() && !e.target.closest('.mwrap')) close(); }, true);
+      addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+    })();
+
+    // ---- first-launch agreement (shown before the home screen until the user agrees) ----
+    (() => {
+      const g = $('#gate'), chk = $('#gChk'), ok = $('#gOk'), T = $('#gT'), tx = $('#gTx');
+      let loaded = false;
+      chk.checked = false; // never pre-checked, even if the browser tries to restore the box
+      ok.disabled = true;
+      chk.onchange = () => { ok.disabled = !chk.checked; };
+      async function openTerms(sec) {
+        T.hidden = false;
+        if (!loaded) {
+          try { tx.innerHTML = await (await fetch('/terms.html')).text(); loaded = true; }
+          catch { tx.textContent = 'Could not load the Terms. Please check your connection and try again.'; return; }
+        }
+        const t = sec && tx.querySelector('#' + sec);
+        tx.scrollTop = t ? t.offsetTop - tx.offsetTop - 8 : 0;
+      }
+      g.addEventListener('click', e => {
+        const b = e.target.closest('.glink');
+        if (b) openTerms(b.dataset.t === 'privacy' ? 'sec-11' : '');
+      });
+      $('#gTb').onclick = () => { T.hidden = true; };
+      $('#gExit').onclick = () => {
+        try { window.close(); } catch {}
+        setTimeout(() => { $('#gMain').hidden = true; $('#gDeny').hidden = false; }, 120); // the browser may refuse to close the tab: show a clear message instead
+      };
+      $('#gBack').onclick = () => { $('#gDeny').hidden = true; $('#gMain').hidden = false; };
+      ok.onclick = () => {
+        if (!chk.checked) return;
+        try { localStorage.setItem('naive.terms', '2026-10-04'); } catch {}
+        g.classList.add('closing');
+        setTimeout(() => { document.documentElement.classList.remove('gate'); g.classList.remove('closing'); }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 200);
+      };
+    })();
+    if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+    const idle = f => (window.requestIdleCallback ? requestIdleCallback(f, { timeout: 1500 }) : setTimeout(f, 300));
+
+    setTimeout(() => document.body.classList.add('ready'), 500); // intro finished
+    idle(() => { checkUpdate(false); setInterval(() => checkUpdate(false), 30 * 60 * 1000); });
+
+    function mk(id) {
+      let e = document.createElement('div');
+      e.dataset.id = id;
+      e.innerHTML = `<div class="thw"><img class="th" referrerpolicy="no-referrer" decoding="async" draggable="false"><span class="bdg check"></span><span class="bdg info"></span></div><div class="fi"><a class="fn"></a><small></small></div><div class="st"><button class="ring" data-a="pause" aria-label="Pause or resume"><svg viewBox="0 0 40 40" fill="none" stroke-width="4"><circle class="tr" cx="20" cy="20" r="${RAD}"/><circle class="pg" cx="20" cy="20" r="${RAD}" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C}"/></svg><svg class="g g-pause" viewBox="0 0 12 12" fill="currentColor"><rect x="2" y="1" width="3" height="10" rx="1"/><rect x="7" y="1" width="3" height="10" rx="1"/></svg><svg class="g g-play" viewBox="0 0 12 12" fill="currentColor"><path d="M3 1.6v8.8a.6.6 0 0 0 .9.5l7-4.4a.6.6 0 0 0 0-1L3.9 1.1a.6.6 0 0 0-.9.5Z"/></svg></button><span class="pc"></span><button class="xb" data-a="cancel" aria-label="Cancel download">&times;</button><button class="ib" data-a="reveal">${IF}</button><button class="ib" data-a="open">${IP}</button><button class="rm" data-a="remove" aria-label="Remove from list">${ID}</button></div>`;
+      return e;
+    }
+
+    function upsert(j) {
+      if (!j || !j.id) return;
+      let s = norm(j.status);
+      if (s === 'canceled' || s === 'removed') {
+        let e = R.get(j.id);
+        if (e) { e.classList.add('leaving'); setTimeout(() => e.remove(), 180); }
+        R.delete(j.id);
+        return count();
+      }
+      let e = R.get(j.id);
+      if (!e) {
+        e = mk(j.id);
+        R.set(j.id, e);
+        if (live) { e.classList.add('fresh'); setTimeout(() => e.classList.remove('fresh'), 300); }
+        $('#jobs').prepend(e);
+        if (j.thumb) e.querySelector('.th').src = j.thumb;
+      }
+      const prev = e._s;
+      e._s = s;
+      if (e._c !== s) { e._c = s; e.className = 'row ' + s; }
+      if (s === 'done' && prev !== 'done') { icon(e.querySelector('.bdg.check'), CHK, prev !== undefined); if (prev !== undefined) toast({ ...j, name: j.name || (j.file && j.file.split(/[\\/]/).pop()) }); }
+      else if (s === 'error' && prev !== 'error') icon(e.querySelector('.bdg.info'), INF, false);
+      e.dataset.s = s;
+      let n = e.querySelector('.fn');
+      const nm = j.name || j.title || j.url || 'Download'; if (n.textContent !== nm) n.textContent = nm;
+      if (s === 'done') {
+        n.href = dl('/api/file/' + encodeURIComponent(j.id);
+        n.download = '';
+      } else {
+        n.removeAttribute('href');
+        n.removeAttribute('download');
+      }
+      let o = j.opts || {};
+      let p = Number(j.pct);
+      p = Number.isFinite(p) ? Math.max(0, Math.min(100, s === 'done' ? 100 : p)) : 0;
+      e.querySelector('small').textContent = s === 'error' ? (j.error || 'Download failed') : [o.kind === 'audio' ? (s === 'done' && j.real) || o.label || 'Audio' : o.label || 'Best', o.kind !== 'audio' && o.container === 'webm' && o.container.toUpperCase(), s === 'downloading' && j.speed, s === 'downloading' && j.eta && 'ETA ' + j.eta].filter(Boolean).join(' · ');
+      e.querySelector('.pg').style.strokeDashoffset = C - p / 100 * C;
+      e.querySelector('.pc').textContent = s === 'queued' ? 'Waiting' : s === 'paused' ? 'Paused' : Math.round(p) + '%';
+      count();
+    }
+
+    let cq = 0;
+    function count() { if (!cq) cq = requestAnimationFrame(() => { cq = 0; count2(); }); }
+    function count2() {
+      let v = [...R.values()];
+      let d = v.filter(e => e.classList.contains('done')).length;
+      let a = v.filter(e => /queued|downloading|paused/.test(e.dataset.s)).length;
+      $('#cnt').textContent = v.length ? `${d} of ${v.length} finished` : '';
+      $('#empty').hidden = v.length > 0;
+      $('#bd').hidden = !a;
+      $('#bd').textContent = a;
+      $('#clear').hidden = !d;
+    }
+
+    const queue = async (v, opts) => {
+      try {
+        let r = await api(dl('/api/download'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: v.url, title: v.title, thumb: v.thumb, opts })
+        });
+        upsert({ ...r, title: r.title || v.title, thumb: r.thumb || v.thumb, opts: r.opts || opts, status: r.status || 'queued' });
+        return r;
+      } catch (e) {
+        msg(e.message);
+      }
+    };
+
+    let live = false; setTimeout(() => { live = true; }, 1500); // rows that arrive while the app is starting appear instantly; only later new ones animate
+    let ev = new EventSource(dl('/api/events'));
+    ev.onmessage = e => {
+      try {
+        upsert(JSON.parse(e.data));
+      } catch {}
+    };
+
+    $('#jobs').onclick = e => {
+      let b = e.target.closest('[data-a]');
+      if (!b) return;
+      let id = b.closest('.row').dataset.id;
+      let a = b.dataset.a;
+      if (a === 'pause' && b.closest('.row').dataset.s === 'paused') a = 'resume';
+      if (a === 'cancel' || a === 'remove') {
+        fetch(dl('/api/jobs/' + encodeURIComponent(id), { method: 'DELETE' });
+      } else {
+        fetch(dl('/api/' + a + '/' + encodeURIComponent(id), { method: 'POST' });
+      }
+    };
+
+    $('#clear').onclick = () => fetch(dl('/api/jobs'), { method: 'DELETE' });
+  </script>
+  <script src="/stt.js"></script>
+</body>
+</html>
