@@ -1774,7 +1774,7 @@
         const done = v => { if (pend === res) pend = null; res(v); };
         msg('');
         loadOn();
-        const my = es = new EventSource(dl('/api/resolve/stream?q=' + encodeURIComponent(q));
+        const my = es = new EventSource(dl('/api/resolve/stream?q=' + encodeURIComponent(q)));
         my.addEventListener('stage', e => setLoad(JSON.parse(e.data)));
         my.addEventListener('result', e => {
           my.close();
@@ -2032,7 +2032,7 @@
       let n = e.querySelector('.fn');
       const nm = j.name || j.title || j.url || 'Download'; if (n.textContent !== nm) n.textContent = nm;
       if (s === 'done') {
-        n.href = dl('/api/file/' + encodeURIComponent(j.id);
+        n.href = dl('/api/file/' + encodeURIComponent(j.id));
         n.download = '';
       } else {
         n.removeAttribute('href');
@@ -2089,9 +2089,9 @@
       let a = b.dataset.a;
       if (a === 'pause' && b.closest('.row').dataset.s === 'paused') a = 'resume';
       if (a === 'cancel' || a === 'remove') {
-        fetch(dl('/api/jobs/' + encodeURIComponent(id), { method: 'DELETE' });
+        fetch(dl('/api/jobs/' + encodeURIComponent(id)), { method: 'DELETE' });
       } else {
-        fetch(dl('/api/' + a + '/' + encodeURIComponent(id), { method: 'POST' });
+        fetch(dl('/api/' + a + '/' + encodeURIComponent(id)), { method: 'POST' });
       }
     };
 
